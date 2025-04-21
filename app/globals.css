@@ -1,7 +1,77 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
+@plugin "daisyui";
 
 body {
   font-family: 'Inter', sans-serif;
-  line-height: none;
+  line-height: 1;
+}
+.admin-hero{
+  aspect-ratio: 3/3;
+}
+
+@media screen and (min-width: 1024px) {
+  .admin-hero{
+    aspect-ratio: 3/2.5;
+  } 
+}
+@media screen and (min-width: 640px) {
+  div.third-column{
+    place-items: center !important;
+    align-self: center !important;
+  }
+  aside.first-column{
+    gap: 0 !important
+  }
+  nav.second-column{
+    gap: 1.25rem !important
+  }
+  li.test-link::after{
+    position: absolute;
+    bottom:0;
+    left: 0;
+    content: " ";
+    display: block;
+    width: 0%;
+    height: 2px;
+    background: #485d3a;
+    transition: width .3s;
+  }
+  li.test-link:hover::after{
+    width: 100%;
+    /* transition: width .3s; */
+  }
+}
+
+@media screen and (max-width: 640px) {
+  nav.active{
+    animation: menubar 1s ease forwards;
+  }
+  
+  @keyframes menubar {
+    0%{
+      width: 0;
+      opacity: 0;
+    }
+    100%{
+      width: 100%;
+      opacity: 1;
+    }
+  }
+  nav.inactive{
+    width:100%;
+    opacity: 1;
+    animation: menubar2 1s ease forwards;
+  }
+  
+  @keyframes menubar2 {
+    0%{
+      width:100%;
+      opacity: 1;
+    }
+    100%{
+      width: 0;
+      opacity: 0;
+    }
+  }
 }

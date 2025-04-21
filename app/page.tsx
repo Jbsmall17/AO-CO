@@ -1,9 +1,17 @@
-import Image from "next/image";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import HowItWorks from "./components/HowItWorks";
+import Footer from "./components/Footer";
+import Slider from "./components/Slider";
 
 export default function Home() {
   return (
-    <div>
-      Bayog website portal
-    </div>
+    <main>
+      <Navbar />
+      <Hero />
+      <HowItWorks />
+      <Slider />
+      <Footer />
+    </main>
   );
 }
