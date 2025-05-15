@@ -8,8 +8,8 @@ import Image, { StaticImageData } from 'next/image';
 import emptyIcon from "../_assests/emptyIcon.svg"
 
 
-export default function page() {
-    const [isEmpty,setIsEmpty] = useState(false)
+ function Page() {
+    const [isEmpty,] = useState(false)
 
     const FileComp = ({icon , file, bgColor}:{icon: StaticImageData, file: string, bgColor: string}) =>{
         return (
@@ -105,3 +105,5 @@ export default function page() {
     </main>
   )
 }
+
+export default Page

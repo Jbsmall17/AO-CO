@@ -6,7 +6,7 @@ import { PiEyeLight, PiEyeSlashLight } from 'react-icons/pi'
 import { useRouter } from 'next/navigation'
 
 
-export default function page() {
+function Page() {
     const router = useRouter()
 
     const handleRouter = (link: string) =>{
@@ -44,3 +44,5 @@ export default function page() {
     </div>
   )
 }
+
+export default Page

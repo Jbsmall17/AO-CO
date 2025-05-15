@@ -15,8 +15,8 @@ interface cardType{
 
 }
 
-export default function page() {
-    const [isEmpty,setIsEmpty] = useState(false)
+ function Page() {
+    const [isEmpty,] = useState(false)
 
     const Card = ({type,paraText1,paraText2,children, bgColor}:cardType) => {
         return (
@@ -263,3 +263,5 @@ export default function page() {
         </main>
   )
 }
+
+export default Page

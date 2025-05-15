@@ -7,7 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
 
-const page = () => {
+const Page = () => {
     const router = useRouter()
     const handleRouter = (link: string) =>{
         router.push(link)
@@ -42,4 +42,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

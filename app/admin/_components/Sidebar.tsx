@@ -1,6 +1,5 @@
 import React from 'react'
 import profilePic from "../_assests/profilePic.png"
-import projectIcon from "../_assests/project-icon.png" 
 import { RiDashboardHorizontalFill,RiFileList2Fill, RiAlarmWarningFill } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
 import { IoAnalyticsSharp} from "react-icons/io5";
