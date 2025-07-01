@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import logo from "@/app/assests/logo.png"
 import { IoSearch, IoNotifications } from "react-icons/io5";

@@ -1,8 +1,8 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import bayog from "../assests/logo.png"
 import Image from "next/image"
-import { RiDashboardHorizontalFill,RiFileList2Fill, RiAlarmWarningFill } from "react-icons/ri";
+import { RiDashboardHorizontalFill } from "react-icons/ri";
 import { IoIosCheckmarkCircle } from "react-icons/io";
 import { IoAnalyticsSharp} from "react-icons/io5";
 import { PiUserSoundFill } from "react-icons/pi";

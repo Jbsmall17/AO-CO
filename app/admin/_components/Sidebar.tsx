@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect } from 'react'
 import profilePic from "../_assests/profilePic.png"
 import { RiDashboardHorizontalFill,RiFileList2Fill, RiAlarmWarningFill } from "react-icons/ri";

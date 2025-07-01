@@ -1,3 +1,4 @@
+"use client"
 import React from 'react'
 import { MdOutlineLogout } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
