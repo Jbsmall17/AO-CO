@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
-// Separate component that uses useSearchParams
+
 function VerificationContent() {
     const searchParams = useSearchParams();
     const token = searchParams.get('token');
@@ -73,7 +73,6 @@ function VerificationContent() {
     );
 }
 
-// Loading fallback component
 function VerificationFallback() {
     return (
         <main className='relative min-h-screen px-4 md:px-6 lg:px-8 xl:px-10 max-w-screen-2xl mx-auto'>
