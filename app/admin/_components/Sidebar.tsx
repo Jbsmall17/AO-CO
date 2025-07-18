@@ -1,24 +1,31 @@
 "use client"
 import React, { useEffect } from 'react'
-import profilePic from "../_assests/profilePic.png"
-import { RiDashboardHorizontalFill,RiFileList2Fill, RiAlarmWarningFill } from "react-icons/ri";
+// import profilePic from "../_assests/profilePic.png"
+import { RiDashboardHorizontalFill,RiFileList2Fill } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
-import { IoAnalyticsSharp} from "react-icons/io5";
-import { IoMdSettings } from "react-icons/io";
 import Image from 'next/image'
 import { IoMdClose } from "react-icons/io"
 import { useMyContext } from '@/app/context/MyContext';
 import logo from "@/app/assests/logo.png"
 import { MdLogout } from "react-icons/md";
-import { usePathname } from 'next/navigation';
+import { FaUser } from "react-icons/fa";
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Sidebar() {
+    const router = useRouter()
+    const user = JSON.parse(sessionStorage.getItem('user') || '{}');
     const pathname = usePathname();
     const {isSidebarOpen,setIsSidebarOpen ,toggleSidebar} = useMyContext()
 
     const isActive = (path: string) => {
         return pathname === path ? 'bg-[#9dc782] text-white' : 'bg-[#f5f5f5] text-[#8a8a8a]';
+    }
+
+    const handleLogout = () => {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        router.push('/login');
     }
 
     useEffect(()=>{
@@ -46,12 +53,13 @@ export default function Sidebar() {
             className='block md:hidden'
         />
         <div className='flex flex-row gap-2 items-center'>
-            <Image 
+            {/* <Image 
                 src={profilePic}
                 alt="profile picture"
                 className='w-[32px] xl:w-[40px] h-[32px] xl:h-[40px]'
-            />
-            <p className='text-base text-black'>ceo@bayog.com</p>
+            /> */}
+            <FaUser className='text-2xl xl:text-3xl text-[#8a8a8a]' />
+            <p className='text-base text-black'>{user?.email}</p>
         </div>
         <div className='cursor-pointer flex flex-col gap-2 items-stretch mt-4'>
             <Link href='/admin/dashboard' 
@@ -74,7 +82,7 @@ export default function Sidebar() {
                 <RiFileList2Fill className='text-2xl' />
                 <p className='text-base font-semibold'>Agents</p>
             </Link>
-            <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
+            {/* <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
                 <FaUserFriends className='text-2xl' />
                 <p className='text-base font-semibold'>Teams</p>
             </div>
@@ -85,13 +93,13 @@ export default function Sidebar() {
             <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
                 <IoAnalyticsSharp className='text-2xl' />
                 <p className='text-base font-semiolbd'>Analytics</p>
-            </div>
-            <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
+            </div> */}
+            {/* <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
                 <IoMdSettings className='text-2xl' />
                 <p className='text-base font-semibold'>Settings</p>
-            </div>
+            </div> */}
         </div>
-        <div className='cursor-pointer my-4 sm:my-6 md:hidden p-2 inline-flex flex-row gap-2 items-center rounded-md border-[1.5px] border-[#001eff]'>
+        <div onClick={handleLogout} className='cursor-pointer my-4 sm:my-6  md:hidden  p-2 inline-flex flex-row gap-2 items-center rounded-md border-[1.5px] border-[#001eff]'>
             <MdLogout className='text-xl' />
             <p>Log Out</p>
         </div>

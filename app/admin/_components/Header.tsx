@@ -15,7 +15,7 @@ export default function Header() {
     const handleLogout = () => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        router.push('/login');
+        router.push('/admin/login');
     }
 
   return (

@@ -29,10 +29,10 @@ const Footer = () => {
             </aside>
             <nav className='second-column'>
                 <h6  className="text-[#0f170a] text-base">Quick Action</h6>
-                <a className="link link-hover text-[#0f170a]">Home</a>
-                <a className="link link-hover text-[#0f170a]">About Us</a>
-                <a className="link link-hover text-[#0f170a]">How it works</a>
-                <a className="link link-hover text-[#0f170a]">Admin Log</a>
+                <Link href="/" className="link link-hover text-[#0f170a]">Home</Link>
+                <Link href="/about" className="link link-hover text-[#0f170a]">About Us</Link>
+                <Link href="/how-it-works" className="link link-hover text-[#0f170a]">How it works</Link>
+                <Link href="/admin/login" className="link link-hover text-[#0f170a]">Admin Log</Link>
             </nav>
             <div className='third-column'>
                 <MdMail className='text-[#485d3a] text-3xl' />

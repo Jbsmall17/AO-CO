@@ -3,7 +3,7 @@ import React from 'react'
 import Image, { StaticImageData } from 'next/image'
 import signup from "../assests/signup.png"
 import upload from "../assests/upload.png"
-import waiting from "../assests/waitingPeriod.png"
+// import waiting from "../assests/waitingPeriod.png"
 import download from "../assests/download.png"
 
 
@@ -49,15 +49,15 @@ const HowItWorks = () => {
                 image={upload}
                 bgColor={"#ffffff"}
             />
-            <Step 
+            {/* <Step 
                 step={"03"}
                 title={"Waiting Period"}
                 description={"Wait for our agents to verity the addresses on the file"}
                 image={waiting}
                 bgColor={"#ffffff"}
-            />
+            /> */}
             <Step 
-                step={"04"}
+                step={"03"}
                 title={"Download Report"}
                 description={"Download the report of your file and transaction complete."}
                 image={download}

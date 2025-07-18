@@ -1,6 +1,5 @@
 "use client"
-import React from 'react'
-import { IoSearch } from "react-icons/io5";
+import React, {useEffect, useState } from 'react'
 import { MdUpload } from "react-icons/md";
 import Image from 'next/image';
 import recentIcon from "../../admin/_assests/recent-icon.svg"
@@ -19,6 +18,7 @@ import{
 import { Line } from "react-chartjs-2"
 import type { ChartData, ChartOptions} from "chart.js"
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -29,11 +29,100 @@ ChartJS.register(
     Title
 )
 
+interface uploadedType {
+    _id: string;
+    status: string;
+    uploadedAt: string;
+}
+
+interface monthlyTaskType {
+    month: string;
+    pending: number;
+    verified: number;
+    total: number;
+}
+
+interface DashboardStatsType {
+    totalPendingFiles: number;
+    totalVerifiedFiles: number;
+    totalComplaints: number;
+    uploads: uploadedType[];
+    totalRequest: number;
+    totalVerified: number;
+    totalPending: number;
+    monthlyTasks: monthlyTaskType[];
+}
 export default function Page() {
-    const [isEmpty,] = React.useState(false)
+    const router = useRouter()
+    const [token, setToken] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     const [isUploading, setIsUploading] = React.useState(false)
     const [fileError, setFileError] = React.useState<string | null>(null)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
+    const [dashboardStats, setDashboardStats] = useState<DashboardStatsType>({
+        totalPendingFiles: 0,
+        totalVerifiedFiles: 0,
+        totalComplaints: 0,
+        uploads: [],
+        totalRequest: 0,
+        totalVerified: 0,
+        totalPending: 0,
+        monthlyTasks:[]
+    })
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'verified':
+                return 'text-[#178a51]';
+            case 'in-progress':
+                return 'text-[#ff0000]'; 
+            case 'pending':
+                return 'text-[#ff8c00]'; 
+            default:
+                return 'text-[#8a8a8a]'; 
+        }
+    } 
+
+    const getdashboardStats = async () => {
+        const endpoint = 'https://bayog-production.up.railway.app/v1/client/dashboard-stats'
+        try{
+            const response = await axios.get(endpoint, {
+                headers: { 
+                    Authorization: `Bearer ${token}` 
+                }
+            })
+            if(response.status === 200) {
+                setDashboardStats({
+                    ...response.data.data
+                })
+            } else {
+                setDashboardStats({
+                    totalPendingFiles: 0,
+                    totalVerifiedFiles: 0,
+                    totalComplaints: 0,
+                    uploads: [],
+                    totalRequest: 0,
+                    totalVerified: 0,
+                    totalPending: 0,
+                    monthlyTasks: []
+                })
+            }
+        } catch (error) {
+            console.error("Error fetching dashboard stats:", error)
+            setDashboardStats({
+                totalPendingFiles: 0,
+                totalVerifiedFiles: 0,
+                totalComplaints: 0,
+                uploads: [],
+                totalRequest: 0,
+                totalVerified: 0,
+                totalPending: 0,
+                monthlyTasks: []
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    } 
 
     const onSubmit = async () => {
         const endpoint = 'https://bayog-production.up.railway.app/v1/client/upload-tasks'
@@ -48,7 +137,7 @@ export default function Page() {
             
             const response = await axios.post(endpoint, formData, {
                 headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             })
@@ -62,6 +151,9 @@ export default function Page() {
         } catch (error) {
             console.error('Upload error:', error)
             toast.error("An error occurred during upload.")
+            if( fileInputRef.current) {
+                fileInputRef.current.value = ''
+            }
         } finally {
             setIsUploading(false)
         }
@@ -95,54 +187,56 @@ export default function Page() {
         return true
     }
 
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-    const data: ChartData<'line'> = {
-        labels: labels.slice(0,5),
-        datasets: [{
-            label: "Total Request",
-            data: [4100,4100,3950,3950,3600],
-            backgroundColor: '#1877f2',
-            borderColor: '#1877f2'
-        },
-        {
-            label: "Total Pending",
-            data: [100,1000,800,800,1200],
-            backgroundColor: "#ff0000",
-            borderColor: "#ff0000"
-        }
-        ,
-        {
-          label: "Total Verified",
-          data: [3900,3900,3500,3500,3000],
-          backgroundColor: "#178a51",
-          borderColor: "#178a51"  
-        }
-    ]
-    }
-
-    const options: ChartOptions<'line'> = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display:false,
-                position: "top"
+    const chartData = React.useMemo(()=>{
+        const lineData: ChartData<'line'> = {
+            labels: [...dashboardStats.monthlyTasks.map(task => task.month)],
+            datasets: [
+        //     {
+        //     label: "Total Request",
+        //     data: [4100,4100,3950,3950,3600,6000,6000,6100,6200,6300,6400,6500],
+        //     backgroundColor: '#1877f2',
+        //     borderColor: '#1877f2'
+        // },
+            {
+                label: "Total Pending",
+                data: [...dashboardStats.monthlyTasks.map(task => task.pending)],
+                backgroundColor: "#ff0000",
+                borderColor: "#ff0000"
             },
-            title: {
-                display: false,
-                text: 'Chart.js Line Chart'
+            {
+            label: "Total Verified",
+            data: [...dashboardStats.monthlyTasks.map(task => task.verified)],
+            backgroundColor: "#178a51",
+            borderColor: "#178a51"  
             }
-        },
-        scales:{
-            y: {
-            min: 0,        
-            max: 5000,      
-            ticks: {
-                stepSize: 1000 
+        ]
+    }
+        return lineData
+    }, [dashboardStats.monthlyTasks])
+
+    const chartOptions = React.useMemo(() => {
+        const options: ChartOptions<'line'> = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false,
+                    position: "top"
+                },
+                title: {
+                    display: false,
+                    text: 'Chart.js Line Chart'
+                }
+            },
+            scales:{
+                y: {
+                    min: 0,        
+                    max: Math.max(...dashboardStats.monthlyTasks.map(task => task.total)) + 10,      
                 }
             }
         }
-    }
+        return options
+    }, [dashboardStats.monthlyTasks])
+
 
     const Card = ({number,desc,color}:{number: number, desc: string,color:string})=>{
         return (
@@ -152,6 +246,21 @@ export default function Page() {
             </div>
         )
     }
+
+    useEffect(() => {
+        const storedToken = sessionStorage.getItem('token')
+        if (storedToken) {
+            setToken(storedToken)
+        }else{
+            router.push('/login')
+        }
+    },[])
+
+    useEffect(() => {
+        if (token) {
+            getdashboardStats()
+        }
+    }, [token])
 
   return (  
         <div>
@@ -175,19 +284,19 @@ export default function Page() {
                     }}
                 />
                 
-                <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
+                {/* <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
                     <IoSearch className='text-xl text-[#8a8a8a] absolute top-[50%] -translate-y-[50%] left-8' />
                     <input 
                         type="text" 
                         placeholder='Search by address, reference number' 
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
                     />
-                </div>
+                </div> */}
                 <div className='flex flex-col sm:flex-row justify-between gap-5 md:gap-6 lg:gap-8'>
                     <div className='flex flex-col gap-4 w-full sm:w-[200px] md:w-[250px] lg:w-[300px]'>
                         <div 
                             onClick={handleUploadClick}
-                            className={`bg-[#485d3a] rounded-lg py-3 lg:py-5 flex flex-row gap-3 justify-center items-center text-white transition-all duration-300 ease-linear cursor-pointer ${
+                            className={`bg-[#485d3a] flex-1 rounded-lg py-3 lg:py-5 flex flex-row gap-3 justify-center items-center text-white transition-all duration-300 ease-linear cursor-pointer ${
                                 isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80 active:opacity-80'
                             }`}
                         >
@@ -200,52 +309,50 @@ export default function Page() {
                                 <p className='text-sm sm:text-base font-semibold'>
                                     {isUploading ? 'Uploading...' : 'Upload Addresses'}
                                 </p>
-                                <p className='text-sm font-normal'>Excel file</p>
+                               <p className='text-sm font-normal'>Excel file</p>
                             </div>
                         </div>
+        
                         
-                        {/* Display file validation errors */}
-                        {fileError && (
-                            <div className='text-red-500 text-sm px-2'>
-                                {fileError}
-                            </div>
-                        )}
-                        
-                        <div className='cursor-pointer bg-white rounded-lg py-3 lg:py-5  flex flex-row gap-3 justify-center items-center border-[1.5px] border-[#485d3a] text-[#485d3a]'>
+                        {/* <div className='cursor-pointer bg-white rounded-lg py-3 lg:py-5  flex flex-row gap-3 justify-center items-center border-[1.5px] border-[#485d3a] text-[#485d3a]'>
                             <p className='text-sm sm:text-base font-semibold'>Upload History</p>
-                        </div>
+                        </div> */}
                     </div>
                     <div className='flex-1 flex flow-row gap-3 md:gap-4 lg:gap-6'>
                     <Card
-                        number={50}
+                        number={dashboardStats.totalPendingFiles}
                         desc={"Files pending"}
                         color={"text-[#ff0000]"}
                     />
                     <Card
-                        number={27}
+                        number={dashboardStats.totalVerifiedFiles}
                         desc={"Files verified"}
                         color={"text-[#178a51]"} 
                     />
                     <Card
-                        number={2}
+                        number={dashboardStats.totalComplaints}
                         desc={"Complains"}
                         color={"text-[#ff0000]"}
                     />
                     </div>
                 </div>
+                <div className='flex flex-col h-[350px] bg-white rounded-lg pb-6 my-4 md:my-6 lg:my-8'>
+                    <div className="border-b-2 border-b-[#131313] py-4 px-6 flex flex-row justify-between items-center">
+                        <div className='flex flex-row gap-2 items-center'>
+                            <Image className='w-[24px] sm:w-[28px] h-[24px] sm:h-[28px]' src={recentIcon} alt='recent icon' />
+                            <p >Recent Uploads</p>
+                        </div>
+                        {/* <p>View all</p> */}
+                    </div>       
                 {
-                    !isEmpty
+                    isLoading 
+                    ? <div className='flex-1 flex justify-center items-center'>
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#485d3a]"></div>
+                    </div>
+                    : dashboardStats.uploads.length > 0
                     ?
                     <>
-                    <div className='min-h-[200px] md:min-h-[300px] lg:min-h-[350px] bg-white rounded-lg pb-6 mb-4 md:mb-6 lg:mb-8'>
-                        <div className="border-b-2 border-b-[#131313] py-4 px-6 flex flex-row justify-between items-center">
-                            <div className='flex flex-row gap-2 items-center'>
-                                <Image className='w-[24px] sm:w-[28px] h-[24px] sm:h-[28px]' src={recentIcon} alt='recent icon' />
-                                <p >Recent Uploads</p>
-                            </div>
-                            <p>View all</p>
-                        </div>
-                        <table className='w-full'>
+                    <table className='w-full'>
                             <thead>
                                 <tr className='border-b border-b-[#c4c4c4]'>
                                     <th className='text-sm sm:text-base text-start py-2 md:py-4 px-4 md:px-6 text-[#626262]'>No</th>
@@ -255,43 +362,40 @@ export default function Page() {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className='border-b border-b-[#c4c4c4]'>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>01</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#178a51]'>Verified</td>
-                                </tr>
-                                <tr className='border-b border-b-[#c4c4c4]'>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>02</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#178a51]'>Verified</td>
-                                </tr>
-                                <tr className='border-b border-b-[#c4c4c4]'>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>03</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#ff0000]'>In Progress</td>
-                                </tr>
-                                <tr className='border-b border-b-[#c4c4c4]'>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>04</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                    <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                    <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#ff0000]'>In Progress</td>
-                                </tr>
+                                {
+                                    dashboardStats.uploads.slice(0,4).map((upload, index) => (
+                                        <tr key={upload._id} className={`${index !== 3 ? 'border-b border-b-[#c4c4c4]' : ''}`}>
+                                            <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>0{index + 1}</td>
+                                            <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>{upload._id}</td>
+                                            <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>{new Date(upload.uploadedAt).toLocaleString()}</td>
+                                            <td className={`text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 ${getStatusColor(upload.status)}`}>{upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}</td>
+                                        </tr>
+                                    ))
+                                }
                             </tbody>
-                        </table>
+                    </table>
+                    </>
+                    :
+                    <div className='flex-1 flex justify-center items-center'>
+                            <div className='max-w-[300px] flex flex-col gap-2 items-center'>
+                                <Image src={uploadIcon} alt='upload icon' />
+                                <p className='text-base md:text-xl font-semibold'>No Uploads yet</p>
+                                <p className='text-center text-sm md:text-base'>Expect to see your recent uploads appear here soon</p>
+                                <button className='cursor-pointer hover:opacity-80 active:opacity rounded-lg text-base text-white md:text-xl py-2 px-6 md:px-8 bg-[#484545]'>Upload</button>
+                            </div>
                     </div>
-                    <div className='mb-3 md:mb-4 lg:mb-5 rounded-lg bg-white py-4 px-4 md:px-6 lg:px-8'>
+                }
+                </div>
+                <div className='mb-3 md:mb-4 lg:mb-5 rounded-lg bg-white py-4 px-4 md:px-6 lg:px-8'>
                         <p className='text-base sm:text-xl font-semibold mb-2'>Upload History</p>
-                        <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
+                        {/* <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
                             <option value="daily">Daily</option>
                             <option value="monthly">Monthly</option>
                             <option value="yearly">Yearly</option>
-                        </select>
+                        </select> */}
                         <div className='flex flex-col sm:flex-row gap-3 lg:gap-4 md:gap-6 gap-8'>
                             <div className="py-3 md:py-4 lg:py-5 w-full">
-                                <Line data={data} options={options} />
+                                <Line data={chartData} options={chartOptions} />
                             </div>
                             <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                                 <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>
@@ -310,33 +414,13 @@ export default function Page() {
                                 </div>
                                 <div className='flex flex-col gap-3'>
                                     <p className='text-xl font-semibold'>Current Statistics</p>
-                                    <p className='text-base'>Total Request: 4590</p>
-                                    <p className='text-base'>Total Verified: 3925</p>
-                                    <p className='text-base'>Total pending: 1720</p>
+                                    <p className='text-base'>Total Request: {dashboardStats.totalRequest}</p>
+                                    <p className='text-base'>Total Verified: {dashboardStats.totalVerified}</p>
+                                    <p className='text-base'>Total pending: {dashboardStats.totalPending}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    </>
-                    :
-                    <div className='flex flex-col h-[200px] md:min-h-[300px] lg:min-h-[350px] bg-white rounded-lg pb-6'>
-                        <div className="border-b-2 border-b-[#131313] py-4 px-6 flex flex-row justify-between items-center">
-                            <div className='flex flex-row gap-2 items-center'>
-                                <Image src={recentIcon} alt='recent icon' />
-                                <p>Recent Uploads</p>
-                            </div>
-                            <p>View all</p>
-                        </div>
-                        <div className='flex-1 flex justify-center items-center'>
-                            <div className='w-[90%] max-w-[300px] flex flex-col gap-2 items-center'>
-                                <Image src={uploadIcon} alt='upload icon' />
-                                <p className='text-base md:text-xl font-semibold'>No Uploads yet</p>
-                                <p className='text-center text-sm md:text-base'>Expect to see your recent uploads appear here soon</p>
-                                <button className='cursor-pointer hover:opacity-80 active:opacity rounded-lg text-base text-white md:text-xl py-2 px-6 md:px-8 bg-[#484545]'>Upload</button>
-                            </div>
-                        </div>
-                    </div>
-                }
         </div>
   )
 }

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import axios from 'axios'
 import {useForm, SubmitHandler} from 'react-hook-form';
 import { toast, Toaster } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 interface ComplainType {
     title: string;
@@ -31,6 +32,7 @@ interface ComplainFormInput {
 }
 
 export default function Page() {
+    const router = useRouter();
     const {register, handleSubmit, formState: {errors}, setValue} = useForm<ComplainFormInput>({
         defaultValues: {
             title: '',
@@ -39,10 +41,32 @@ export default function Page() {
     });
     const endpoint = "https://bayog-production.up.railway.app/v1/client/submit-complaint"
     const baseUrl = "https://bayog-production.up.railway.app/v1/client/complaints"
-    const token = sessionStorage.getItem('token');
+    const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [complains, setComplains] = useState<ComplainObjType[]>([]);
     const [isLoadingComplains, setIsLoadingComplains] = useState(true);
+    const [loadMore, setLoadMore] = useState(false);
+    const [keyword, setKeyword] = useState('');
+    const [complainType, setComplainType] = useState('all');
+
+    const handleSearch = async (value : string) => {
+        setKeyword(value)
+        const endpoint = `${baseUrl}?search=${value}`
+        try{
+            const response = await axios.get(endpoint,{
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+            if(response.status === 200){
+                setComplains(response.data.data)
+            }
+        }catch(err){
+            setComplains([])
+            console.error("Error searching clients:", err);
+        }
+    }
+
 
     const getStatusColor = (status: string) => {
         switch(status) {
@@ -103,6 +127,7 @@ export default function Page() {
     } 
 
     const getComplains = async (filter: string) => {
+        setComplainType(filter);
         try{
             const response = await axios.get(`${filter== "all" ?baseUrl :`${baseUrl}?status=${filter}`}`, {
                 headers: {  
@@ -128,10 +153,20 @@ export default function Page() {
         getComplains(filter);
     }
 
+    useEffect(()=>{
+        const storedToken = sessionStorage.getItem("token");
+        if (storedToken) {
+            setToken(storedToken);
+        } else {
+            router.push("/login");
+        }
+    },[])
 
     useEffect(()=>{
-        getComplains("all");
-    },[])
+        if(token){
+            getComplains("all");
+        }
+    },[token])
 
   return (
         <div>
@@ -139,8 +174,10 @@ export default function Page() {
                 <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
                     <IoSearch className='text-xl text-[#8a8a8a] absolute top-[50%] -translate-y-[50%] left-8' />
                     <input 
+                        value={keyword}
+                        onChange={(e) => handleSearch(e.target.value)}
                         type="text" 
-                        placeholder='Search by address, reference number' 
+                        placeholder='Search complains' 
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
                     />
                 </div>
@@ -149,20 +186,24 @@ export default function Page() {
                     <ul className='flex flex-row gap-4 md:gap-6 lg:gap-10 items-center list-none'>
                         <li 
                             onClick={() => handleFilter('all')}
-                            className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'
+                            className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${complainType === 'all' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
                         >All
                         </li>
                         <li 
                             onClick={() => handleFilter('opened')}
-                            className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>
-                            Opened
+                            className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${complainType === 'opened' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
+                        >Opened
                         </li>
                         <li 
                             onClick={() => handleFilter('in-review')}
-                            className='cursor-pointer text-base whitespace-nowrap px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>In review</li>
+                            className={`cursor-pointer text-base whitespace-nowrap px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${complainType === 'in-review' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
+                        >In review
+                        </li>
                         <li 
                             onClick={() => handleFilter('resolved')}
-                            className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Resolved</li>
+                            className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${complainType === 'resolved' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
+                        >Resolved
+                        </li>
                     </ul>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -196,6 +237,22 @@ export default function Page() {
                     ?
                     <>
                     {
+                    !loadMore
+                    ?
+                    complains.slice(0,3).map((complain,index)=>{
+                        return (
+                            <Complain 
+                                key={index}
+                                title={complain.subject}
+                                desc={complain.message}
+                                date={new Date(complain.createdAt).toLocaleDateString()}
+                                time={new Date(complain.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                status={complain.status}
+                                id={complain.complaintID}
+                            />
+                        )
+                    })
+                    :
                     complains.map((complain,index)=>{
                         return (
                             <Complain 
@@ -210,9 +267,16 @@ export default function Page() {
                         )
                     })
                 }
-                    <button className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
-                        Load More complains
+                {
+                    complains.length > 3 &&
+                    <button 
+                        onClick={() => setLoadMore(!loadMore)}
+                        className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
+                        {
+                            loadMore ? "Show Less Complains" : "Load More Complains"
+                        }
                     </button>
+                }
                     </>
                     : 
                      <div className='flex-1 flex justify-center items-center h-full'>

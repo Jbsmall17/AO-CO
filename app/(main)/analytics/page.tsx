@@ -1,6 +1,19 @@
 "use client"
-import React, { useState } from 'react'
-import { IoSearch } from 'react-icons/io5'
+import React, { useState, useEffect } from 'react'
+import { PiEmptyBold } from "react-icons/pi";
+import dynamic from 'next/dynamic'
+
+const Line = dynamic(() => import('react-chartjs-2').then(mod => ({ default: mod.Line })), {
+  ssr: false,
+  loading: () => <div className="flex justify-center items-center h-64">Loading chart...</div>
+})
+
+const Bar = dynamic(() => import('react-chartjs-2').then(mod => ({ default: mod.Bar })), {
+  ssr: false,
+  loading: () => <div className="flex justify-center items-center h-64">Loading chart...</div>
+})
+
+
 import{
     Chart as ChartJS,
     CategoryScale,
@@ -12,9 +25,9 @@ import{
     Legend,
     Title
 } from "chart.js"
-import { Line, Bar } from "react-chartjs-2"
 import type { ChartData, ChartOptions} from "chart.js"
-import { PiEmptyBold } from "react-icons/pi";
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
 
 ChartJS.register(
     CategoryScale,
@@ -27,89 +40,166 @@ ChartJS.register(
     Title
 )
 
+interface monthlyTasksType {
+    month: string,
+    pending: number,
+    verified: number,
+    total: number
+}
+
+interface AnalyticsDataType {
+    totalRequest: number;
+    totalPending: number;
+    totalVerified: number;
+    monthlyTasks: monthlyTasksType[];
+}
 
 export default function Page() {
+    const router = useRouter();
+    const [token, setToken] = useState<string | null>(null);
+    const [analyticsData, setAnalyticsData] = useState<AnalyticsDataType>({
+        totalRequest: 0,
+        totalPending: 0,
+        totalVerified: 0,
+        monthlyTasks: []
+    });
     const [isEmpty,] = useState(false)
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-
-    const data: ChartData<'line'> = {
-        labels: labels.slice(0,5),
-        datasets: [{
-            label: "Total Request",
-            data: [4100,4100,3950,3950,3600],
-            backgroundColor: '#1877f2',
-            borderColor: '#1877f2' 
-        },
-        {
-            label: "Total Pending",
-            data: [100,1000,800,800,1200],
-            backgroundColor: "#ff0000",
-            borderColor: "#ff0000"
-        },
-        {
-            label: "Total Verified",
-            data: [3900,3900,3500,3500,3000],
-            backgroundColor: "#178a51",
-            borderColor: "#178a51"  
-        }
-        ]
-    }
-
-    const data2 : ChartData<'bar'> = {
-        labels: labels.slice(0,5),
-        datasets: [
-            {
-                label: "Total Verified",
-                data: [3700,3650,3100,2900,2700],
-                backgroundColor: '#178a51'
-            },
+    
+    const chartData = React.useMemo(() => {
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        
+        const lineData: ChartData<'line'> = {
+            labels: [...analyticsData.monthlyTasks.map(task => task.month)],
+            datasets: [
+            //     {
+            //     label: "Total Request",
+            //     data: [4100,4100,3950,3950,3600],
+            //     backgroundColor: '#1877f2',
+            //     borderColor: '#1877f2' 
+            // },
             {
                 label: "Total Pending",
-                data: [400,500,500,1200,1600],
+                data: [...analyticsData.monthlyTasks.map(task => task.pending)],
                 backgroundColor: "#ff0000",
                 borderColor: "#ff0000"
-            }
-        ]
-    }
-
-    const options: ChartOptions<'line'> = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-                position: "top"
             },
-            title: {
-                display: false,
-                text: 'Chart.js Line Chart'
+            {
+                label: "Total Verified",
+                data: [...analyticsData.monthlyTasks.map(task => task.verified)],
+                backgroundColor: "#178a51",
+                borderColor: "#178a51"  
             }
-        },
-        scales:{
-            y: {
-            min: 0,        
-            max: 5000,      
-            ticks: {
-                stepSize: 1000 
+            ]
+        }
+
+        const barData : ChartData<'bar'> = {
+            labels: [...analyticsData.monthlyTasks.map(task => task.month)],
+            datasets: [
+                {
+                    label: "Total Verified",
+                    data: [...analyticsData.monthlyTasks.map(task => task.verified)],
+                    backgroundColor: '#178a51'
+                },
+                {
+                    label: "Total Pending",
+                    data: [...analyticsData.monthlyTasks.map(task => task.pending)],
+                    backgroundColor: "#ff0000",
+                    borderColor: "#ff0000"
+                }
+            ]
+        }
+
+        return { lineData, barData }
+    }, [analyticsData.monthlyTasks]);
+
+    const chartOptions = React.useMemo(() => {
+        const lineOptions: ChartOptions<'line'> = {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false,
+                    position: "top"
+                },
+                title: {
+                    display: false,
+                    text: 'Chart.js Line Chart'
+                }
+            },
+            // scales:{
+            //     y: {
+            //     min: 0,        
+            //     max: 1000,      
+            //     ticks: {
+            //         stepSize: 100 
+            //         }
+            //     }
+            // }
+        }
+
+        const barOptions: ChartOptions<'bar'> = {
+            responsive: true,
+            plugins: {
+                legend:{
+                    display: false,
+                },
+                title: {
+                    display: false
                 }
             }
         }
-    }
 
-    const options2: ChartOptions<'bar'> = {
-        responsive: true,
-        plugins: {
-            legend:{
-                display: false,
-            },
-            title: {
-                display: false
+        return { lineOptions, barOptions }
+    }, [analyticsData.monthlyTasks]);
+
+    const getAnalytics = async () => {
+        const baseUrl = "https://bayog-production.up.railway.app/v1/client/task-analytics";
+        try {
+            const response = await axios.get(baseUrl, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            if (response.status === 200) {
+                setAnalyticsData({...response.data.data});
+            ;
+            } else {
+                console.error("Failed to fetch analytics data");
+                setAnalyticsData({
+                    totalRequest: 0,
+                    totalPending: 0,
+                    totalVerified: 0,
+                    monthlyTasks: []
+                }); 
             }
+        } catch (error) {
+            console.error("Error fetching analytics:", error);
+            setAnalyticsData({
+                totalRequest: 0,
+                totalPending: 0,
+                totalVerified: 0,
+                monthlyTasks: []
+            });
         }
     }
 
+    useEffect(() => {
+        const token = sessionStorage.getItem('token');
+        if (token) {;
+            setToken(token);
+        } else {
+            router.push('/login');
+        }
+    }, [])
+
+     useEffect(()=>{
+        if(token){
+            getAnalytics();
+        }
+    },[token])
+
   return (
         <>
-            <div>
+            {/* <div>
                 <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
                     <IoSearch className='text-xl text-[#8a8a8a] absolute top-[50%] -translate-y-[50%] left-8' />
                     <input 
@@ -118,8 +208,8 @@ export default function Page() {
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
                     />
                 </div>
-            </div>
-            <div className='mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row gap-4 md:gap-8 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
+            </div> */}
+            {/* <div className='mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row gap-4 md:gap-8 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
                 <select className='border-2 border-[#485d3a] rounded-xl p-2 self-start md:self-center text-base font-semibold'>
                     <option value="daily">Daily</option>
                     <option value="monthly">Monthly</option>
@@ -131,7 +221,7 @@ export default function Page() {
                     <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Verified</li>
                     <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Complains</li>
                 </ul>
-            </div>
+            </div> */}
             <p className='mb-2 md:m-3 lg:mb-4 font-semibold text-base lg:text-xl'>Report Analysis</p>
             <div className={`mb-6 md:mb-8 lg:mb-10 rounded-lg bg-white py-2 md:py-4 px-4 md:px-6 lg:px-8 min-h-[250px] md:min-h-[300px] lg:min-h-[350px] ${isEmpty ? "flex justify-center items-center": "block"}`}>
                 {
@@ -145,15 +235,15 @@ export default function Page() {
                 :
                 <>
                 <div>
-                    <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
+                    {/* <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
                         <option value="daily">Daily</option>
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
-                    </select> 
+                    </select>  */}
                 </div>    
                 <div className='flex flex-col sm:flex-row gap-4 md:gap-6 gap-8'>
                 <div className="py-3 md:py-4 lg:py-5 flex-1 min-h-[250px] sm:min-h-[350px] lg:min-h-[450px]">
-                    <Line data={data} options={options} />
+                    <Line data={chartData.lineData} options={chartOptions.lineOptions} />
                 </div>
                 <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                     <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>
@@ -172,9 +262,9 @@ export default function Page() {
                     </div>
                     <div className='flex flex-col gap-3'>
                         <p className='text-xl font-semibold'>Current Statistics</p>
-                        <p className='text-base'>Total Request: 4590</p>
-                        <p className='text-base'>Total Verified: 3925</p>
-                        <p className='text-base'>Total pending: 1720</p>
+                        <p className='text-base'>Total Request: {analyticsData.totalRequest}</p>
+                        <p className='text-base'>Total Verified: {analyticsData.totalVerified}</p>
+                        <p className='text-base'>Total pending: {analyticsData.totalPending}</p>
                     </div>
                 </div>
                 </div>
@@ -194,15 +284,15 @@ export default function Page() {
                     :
                 <> 
                 <div>
-                    <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
+                    {/* <select className='rounded-lg border-[1.5px] border-black py-2 px-4'>
                         <option value="daily">Daily</option>
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
-                    </select> 
+                    </select>  */}
                 </div>
                 <div className='py-4 md:py-5 lg:py-7 flex flex-col sm:flex-row gap-4 md:gap-6 gap-8'>
                     <div className="flex-1">
-                        <Bar data={data2} options={options2} />
+                        <Bar data={chartData.barData} options={chartOptions.barOptions} />
                     </div>
                     <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                         <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>
@@ -217,8 +307,8 @@ export default function Page() {
                         </div>
                         <div className='flex flex-col gap-3'>
                             <p className='text-xl font-semibold'>Current Statistics</p>
-                            <p className='text-base'>Total Verified: 3925</p>
-                            <p className='text-base'>Total pending: 1720</p>
+                            <p className='text-base'>Total Verified: {analyticsData.totalVerified}</p>
+                            <p className='text-base'>Total pending: {analyticsData.totalPending}</p>
                         </div>
                     </div>
                 </div>

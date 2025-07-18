@@ -4,6 +4,7 @@ import { IoSearch, IoChatbubbles } from 'react-icons/io5'
 import emptyIcon from "../../admin/_assests/emptyIcon.svg"
 import Image from 'next/image'
 import axios from 'axios'  
+import { useRouter } from 'next/navigation'
 
 interface CardType {
     num: string;
@@ -33,6 +34,8 @@ interface NotificationObjType{
 
 
 export default function Page() {
+    const router = useRouter();
+    const [token, setToken] = useState<string | null>(null);
     const baseurl= 'https://bayog-production.up.railway.app/v1/client/notifications'
     const [notifications,setNotifications] = useState<NotificationObjType[]>([])
     const [metric,setMetric] = useState({
@@ -41,6 +44,11 @@ export default function Page() {
         "complaint resolution": 0
     })
     const [loading, setLoading] = useState(true)
+    const [loadMore, setLoadMore] = useState(false)
+    const [keyword, setKeyword] = useState("")
+    const [messageType, setMessageType] = useState("")
+
+
     const Card = ({num,type,color,borderColor}:CardType)=>{
         return (
             <div className={`flex-1 border-2 ${borderColor} rounded-2xl bg-white min-h-[150px] sm:min-h-[200px] flex flex-col justify-center items-center gap-2`}>
@@ -72,11 +80,41 @@ export default function Page() {
         )
     }
 
-    const  getNotifications = async () => {
+    const handleSearch = async (value: string) => {
+        setKeyword(value)
+        const endpoint = `${baseurl}?search=${value}`
         try {
-            const response = await axios.get(baseurl, {
+            const response = await axios.get(endpoint, {
                 headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (response.status === 200) {
+                setNotifications([...response.data.data])
+                setMetric({
+                    ...response.data.counts
+                })
+            }
+        } catch (error) {
+            setNotifications([])
+            setMetric({
+                message: 0,
+                report: 0,
+                "complaint resolution": 0
+            })
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const  getNotifications = async (type: string) => {
+        setMessageType(type)
+        try {
+            const response = await axios.get(`${baseurl}?type=${type}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             })
@@ -99,9 +137,24 @@ export default function Page() {
         }
     }
 
+    const handleFilter = (type: string) => {
+        setLoading(true)
+        getNotifications(type)
+    }
+
     useEffect(()=>{
-        getNotifications()
-    },[])
+        const storedToken = sessionStorage.getItem("token");
+        if (storedToken) {
+            setToken(storedToken);
+        } else {
+            router.push("/login");
+        }
+        },[])
+
+    useEffect(()=>{
+        if(token)
+            getNotifications("")
+    },[token])
 
   return (
         <>
@@ -109,6 +162,8 @@ export default function Page() {
                 <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
                     <IoSearch className='text-xl text-[#8a8a8a] absolute top-[50%] -translate-y-[50%] left-8' />
                     <input 
+                        value={keyword}
+                        onChange={(e) => handleSearch(e.target.value)}
                         type="text" 
                         placeholder='Search by address, reference number' 
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
@@ -118,10 +173,15 @@ export default function Page() {
             <div className='w-full mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row gap-4 md:gap-8 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
                 <p className='self-start md:self-center text-base font-semibold'>Filter by:</p>
                 <ul className='flex flex-row gap-4 md:gap-6 lg:gap-10 items-center list-none'>
-                    <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>All</li>
-                    <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Messages</li>
-                    <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Reports</li>
-                    <li className='cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl bg-[#e3e2e2] text-[#0f170a] hover:bg-[#485d3a] hover:text-white'>Complaints</li>
+                    <li 
+                        onClick={() => handleFilter("")}
+                        className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${messageType === "" ? "bg-[#485d3a] text-white" : "bg-[#e3e2e2] text-[#0f170a]"}`}>All</li>
+                    <li onClick={() => handleFilter("message")}
+                        className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${messageType === "message" ? "bg-[#485d3a] text-white" : "bg-[#e3e2e2] text-[#0f170a]"}`}>Messages</li>
+                    <li onClick={() => handleFilter("report")}
+                        className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${messageType === "report" ? "bg-[#485d3a] text-white" : "bg-[#e3e2e2] text-[#0f170a]"}`}>Reports</li>
+                    <li onClick={() => handleFilter("complaint resolution")}
+                        className={`cursor-pointer text-base px-4 md:px-6 lg:px-8 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${messageType === "complaint resolution" ? "bg-[#485d3a] text-white" : "bg-[#e3e2e2] text-[#0f170a]"}`}>Complaints</li>
                 </ul>
             </div>
             <div className='mb-4 md:mb-6 lg:mb-8 flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-10'>
@@ -156,6 +216,17 @@ export default function Page() {
                 ?
             <div className='bg-[#e3e2e2] rounded-xl px-6 md:px-8 lg:px-10 py-4 md:py-6 lg:py-8 mb-4 md:mb-mb-6 lg:mb-8 h-[400px] overflow-y-auto'>
                 {
+                    !loadMore
+                    ? notifications.slice(0, 3).map((notification: NotificationObjType) => (
+                        <Notifications
+                            key={notification._id}
+                            title={notification.title}
+                            message={notification.body}
+                            date={new Date(notification.createdAt).toLocaleDateString()}
+                            time={new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        />
+                    ))
+                    :
                     notifications.map((notification: NotificationObjType) => (
                         <Notifications
                             key={notification._id}
@@ -166,9 +237,20 @@ export default function Page() {
                         />
                     ))
                 }
-                <button className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
-                    Load More notifications
-                </button>
+                {
+
+                }
+                {
+                 notifications.length > 3 &&
+                    <button 
+                        onClick={() => setLoadMore(!loadMore)}
+                        className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
+                        {
+                            loadMore ? "Show Less Notifications" : "Load More Notifications"
+                        }
+                    </button>                    
+                }
+
             </div>
             : 
             <div className='bg-[#e3e2e2] rounded-xl px-6 md:px-8 lg:px-10 py-4 md:py-6 lg:py-8 mb-4 md:mb-mb-6 lg:mb-8 min-h-[200px] md:min-h-[300px] lg:min-h-[400px] flex justify-center ityems-center'>

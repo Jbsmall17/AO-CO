@@ -1,6 +1,8 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { Suspense, useEffect, useState } from 'react'
 import axios from 'axios'
+import Link from 'next/link'
+import Image from 'next/image'
 
 
 interface cardType{
@@ -12,10 +14,30 @@ interface cardType{
 
 }
 
+interface taskFileType {
+    _id: string,
+    taskUrl: string,
+    status: string,
+    uploadedAt: string
+} 
+
+interface DashboardStatsType {
+    todaysTasks: number,
+    currentWeekTasks: number,
+    completedTasks: number,
+    failedTasks: number,
+    inProgressTasks: number,
+    verifiedAgents: number,
+    notVerifiedAgents: number,
+    agentComplaints: number,
+    clientComplaints: number,
+    taskFiles: taskFileType[]
+}
+
  function Page() {
     const [token, setToken] = useState<string>("")
-    const [isEmpty,] = useState(false)
-    const [dashboardStats, setDashboardStats] = useState({
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [dashboardStats, setDashboardStats] = useState<DashboardStatsType>({
         todaysTasks: 0,
         currentWeekTasks: 0,
         completedTasks: 0,
@@ -24,9 +46,22 @@ interface cardType{
         verifiedAgents: 0,
         notVerifiedAgents: 0,
         agentComplaints: 0,
-        clientComplaints: 0
+        clientComplaints: 0,
+        taskFiles: []
     })
 
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'verified':
+                return 'text-[#178a51]';
+            case 'in-progress':
+                return 'text-[#ff0000]'; 
+            case 'pending':
+                return 'text-[#ff8c00]'; 
+            default:
+                return 'text-[#8a8a8a]'; 
+        }
+    }
 
     const Card = ({type,paraText1,paraText2,children, bgColor}:cardType) => {
         return (
@@ -55,7 +90,6 @@ interface cardType{
             }
         })
         .then((response) => {
-    
             setDashboardStats({
                 ...dashboardStats,
                 ...response.data.data
@@ -72,8 +106,12 @@ interface cardType{
                 verifiedAgents: 0,
                 notVerifiedAgents: 0,
                 agentComplaints: 0,
-                clientComplaints: 0
+                clientComplaints: 0,
+                taskFiles: []
             })
+        })
+        .finally(()=>{
+            setIsLoading(false)
         })
     }
 
@@ -90,7 +128,7 @@ interface cardType{
 
     return (
             
-        <div className='h-full overflow-auto flex-1 rounded-lg border-[1.5px] border-[#b3b3b3] flex flex-col'>
+        <div className='flex-1 overflow-auto rounded-lg border-[1.5px] border-[#b3b3b3] flex flex-col'>
                     <div className='p-3 md:p-5 lg:p-6 border-b-[1.5px] border-b-[#b3b3b3]'>
                         <p className='text-base md:text-xl font-semibold leading-none'>Dashboard</p>
                     </div>
@@ -165,24 +203,30 @@ interface cardType{
                                         </div>
                                     </Card>
                                 </div>
+                                <Suspense fallback={<div className="min-h-[400px] flex justify-center items-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#485d3a]"></div></div>}>
                                 <div className='overflow-x-auto min-h-[200px] md:min-h-[300px] lg:min-h-[350px] bg-white rounded-lg pb-6 flex flex-col'>
-                                    <div className="border-b-2 border-b-[#131313] py-4 px-6 flex flex-row justify-between items-center">
+                                    <div className='border-b-2 border-b-[#131313] py-4 px-6 flex flex-row justify-between items-center'>
                                         <div className='flex flex-row gap-2 items-center'>
-                                            <img src="/recent-icon.svg" alt='recent icon' />
+                                            <Image src="/recent-icon.svg" alt='recent icon' width={16} height={16} />
                                             <p>Recent Uploads</p>
                                         </div>
-                                        <p>View all</p>
+                                        <Link href="/admin/tasks" className='text-base md:text-xl'>View all</Link>
                                     </div>
                                     {
-                                        isEmpty
-                                        ? <div className='flex-1 flex justify-center items-center'>
-                                        <div className='w-[90%] max-w-[300px] flex flex-col gap-2 items-center'>
-                                            <img src='/upload-icon.svg' alt='upload icon' />
-                                            <p className='text-base md:text-xl font-semibold'>No Uploads yet</p>
-                                            <p className='text-center text-sm md:text-base'>Expect to see your recent uploads appear here soon</p>
-                                            <button className='cursor-pointer hover:opacity-80 active:opacity rounded-lg text-base text-white md:text-xl py-2 px-6 md:px-8 bg-[#484545]'>Upload</button>
+                                        isLoading 
+                                        ?   <div className='flex-1 flex justify-center items-center'>
+                                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#485d3a]"></div>
+                                            </div> 
+                                        : dashboardStats.taskFiles.length === 0
+                                        ? 
+                                        <div className='flex-1 flex justify-center items-center'>
+                                            <div className='w-[90%] max-w-[300px] flex flex-col gap-2 items-center'>
+                                                <Image src='/upload-icon.svg' alt='upload icon' width={24} height={24} />
+                                                <p className='text-base md:text-xl font-semibold'>No Uploads yet</p>
+                                                <p className='text-center text-sm md:text-base'>Expect to see your recent uploads appear here soon</p>
+                                                <button className='cursor-pointer hover:opacity-80 active:opacity rounded-lg text-base text-white md:text-xl py-2 px-6 md:px-8 bg-[#484545]'>Upload</button>
+                                            </div>
                                         </div>
-                                    </div>
                                         :
                                         <table className='w-full min-w-[375px]'>
                                         <thead>
@@ -194,36 +238,25 @@ interface cardType{
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className='border-b border-b-[#c4c4c4]'>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>01</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#178a51]'>Verified</td>
-                                            </tr>
-                                            <tr className='border-b border-b-[#c4c4c4]'>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>02</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#178a51]'>Verified</td>
-                                            </tr>
-                                            <tr className='border-b border-b-[#c4c4c4]'>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>03</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#ff0000]'>In Progress</td>
-                                            </tr>
-                                            <tr className='border-b border-b-[#c4c4c4]'>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>04</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>ABC ltd Address verificatins.xlsx</td>
-                                                <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>11st April 2025 | 12:02pm</td>
-                                                <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 text-[#ff0000]'>In Progress</td>
-                                            </tr>
+                                            {
+                                                dashboardStats.taskFiles.slice(0,3).map((file, index) => (
+                                                    <tr key={file._id} className='border-b border-b-[#c4c4c4]'>
+                                                        <td className='text-sm sm:text-base py-2 md:py-4 px-4 md:px-6'>{index + 1}</td>
+                                                        <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6'>
+                                                            <Link href={file.taskUrl} rel="noopener noreferrer">{file.taskUrl.split('/').pop()}</Link>
+                                                        </td>
+                                                        <td className='text-sm sm:text-base text-center py-2 md:py-4 px-4 md:px-6 text-sm text-[#c4c4c4]'>{new Date(file.uploadedAt).toLocaleString()}</td>
+                                                        <td className={`text-sm sm:text-base py-2 md:py-4 px-4 md:px-6 ${getStatusColor(file.status)}`}>{file.status.charAt(0).toUpperCase() + file.status.slice(1)}</td>
+                                                    </tr>
+                                                ))
+                                            }
                                         </tbody>
                                     </table>
                                     }
                                 </div>
+                                </Suspense>
                                 </div>
-                            )
+                            
                     </div>
         </div>
             

@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 
 const Page = () => {
@@ -28,7 +29,7 @@ const Page = () => {
             <div className='relative admin-hero flex-1 shrink-0'>
                 <div className='hidden md:block absolute top-10 left-0 -translate-x-[65%] w-[100px] lg:w-[115px] h-[30px] lg:h-[40px] rounded-lg lg:rounded-xl bg-[#D8E9CD]'></div>
                 <div className='hidden md:block absolute w-[100px] lg:w-[115px] right-0 bottom-10 h-[30px] lg:h-[40px] translate-x-[35%] rounded-lg lg:rounded-xl bg-[#485D3A]' ></div>
-                <img className='block h-full w-full' src="/adminImg.png" alt={"admin image icon"} />
+                <Image className='block h-full w-full' src="/adminImg.png" alt={"admin image icon"} width={50} height={50} />
             </div>
         </section>
     </main>

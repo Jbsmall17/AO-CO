@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { IoMail } from "react-icons/io5";
 import { FaPhone,FaLocationDot } from "react-icons/fa6";
 import { BsClockHistory } from "react-icons/bs";
+import Image from 'next/image';
 
 
 const page = () => {
@@ -29,6 +30,7 @@ const page = () => {
 
             </div>
         </section>
+        <Suspense fallback={<div className="min-h-[400px] flex justify-center items-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#485d3a]"></div></div>}>
         <section className='px-[5%] bg-[#f5f9f2] py-8 md:py-12 lg:py-14'>
             <div className='flex flex-col md:flex-row gap-4 sm:gap-6 lg:gap-10 xl:gap-12 items-center'>
                 <div className='flex-[2]'>
@@ -40,12 +42,12 @@ const page = () => {
                     </p> 
                 </div>
                 <div className='flex-1 hidden sm:block'>
-                    <img className='block h-full w-full' src='/aboutUnion1.png' alt="about union" />
+                    <Image className='block h-full w-full' src='/aboutUnion1.png' alt="about union" width={50} height={50} />
                 </div> 
             </div> 
             <div className='flex flex-col md:flex-row gap-4 sm:gap-6 lg:gap-10 xl:gap-12 items-center mt-6 md:mt-8 lg:mt-10 xl:mt-14'>
                 <div className='flex-1 hidden sm:block'>
-                    <img className='block h-full w-full' src='/aboutUnion1.png' alt="about union" />
+                    <Image className='block h-full w-full' src='/aboutUnion1.png' alt="about union" width={50} height={50} />
                 </div>
                 <div className='flex-[2] flex justify-end'>
                     <div>
@@ -86,6 +88,7 @@ const page = () => {
 
             </div>
         </section>
+        </Suspense>
     </main>
   )
 }
