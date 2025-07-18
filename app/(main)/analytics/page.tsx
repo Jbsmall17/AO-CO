@@ -66,7 +66,6 @@ export default function Page() {
     const [isEmpty,] = useState(false)
     
     const chartData = React.useMemo(() => {
-        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         
         const lineData: ChartData<'line'> = {
             labels: [...analyticsData.monthlyTasks.map(task => task.month)],

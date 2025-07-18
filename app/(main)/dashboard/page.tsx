@@ -312,7 +312,9 @@ export default function Page() {
                                <p className='text-sm font-normal'>Excel file</p>
                             </div>
                         </div>
-        
+                        {fileError && (
+                            <p className='text-red-500 text-sm'>{fileError}</p>
+                        )}
                         
                         {/* <div className='cursor-pointer bg-white rounded-lg py-3 lg:py-5  flex flex-row gap-3 justify-center items-center border-[1.5px] border-[#485d3a] text-[#485d3a]'>
                             <p className='text-sm sm:text-base font-semibold'>Upload History</p>
