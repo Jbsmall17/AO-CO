@@ -3,8 +3,12 @@ import React, { useEffect } from 'react'
 import Header from '../_components/Header'
 import Sidebar from '../_components/Sidebar'
 import { useRouter } from 'next/navigation';
+import { useMyContext } from '@/app/context/MyContext';
+import TaskModal from '../_components/TaskModal';
+import ComplaintsModal from '../_components/ComplaintsModal';
 
 export default function Layout({children}: {children: React.ReactNode}) {
+  const {isTaskModalOpen, isComplaintsModalOpen} = useMyContext();
   const [token, setToken] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const router = useRouter();
@@ -33,12 +37,20 @@ export default function Layout({children}: {children: React.ReactNode}) {
   }
 
   return (
-    <main className='px-[5%] 2xl:px-0 mx-auto max-w-screen-2xl h-screen overflow-hidden flex flex-col'>
+    <main className='px-[5%] 2xl:px-0 pb-4 mx-auto max-w-screen-2xl h-screen overflow-auto flex flex-col'>
         <Header />
-        <section className='flex-1 flex flex-col lg:flex-row gap-6 mb-4 h-full'>
+        <section className='flex flex-col lg:flex-row gap-6 flex-1'>
             <Sidebar />
             {children}
         </section>
+        {
+          isTaskModalOpen && 
+          <TaskModal />
+        }
+        {
+          isComplaintsModalOpen && 
+            <ComplaintsModal />
+        }
     </main>
   )
 }

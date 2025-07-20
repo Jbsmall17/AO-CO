@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react'
 // import profilePic from "../_assests/profilePic.png"
-import { RiDashboardHorizontalFill,RiFileList2Fill } from "react-icons/ri";
+import { RiDashboardHorizontalFill,RiFileList2Fill, RiAlarmWarningFill } from "react-icons/ri";
 import { FaUserFriends } from "react-icons/fa";
 import Image from 'next/image'
 import { IoMdClose } from "react-icons/io"
@@ -81,6 +81,12 @@ export default function Sidebar() {
                 className={`rounded-md hover:bg-[#9dc782] p-2 hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/agents')}`}>
                 <RiFileList2Fill className='text-2xl' />
                 <p className='text-base font-semibold'>Agents</p>
+            </Link>
+            <Link href={'/admin/complaints'}>
+                <div className={`rounded-md hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/complaints')}`}>
+                    <RiAlarmWarningFill className='text-2xl' />
+                    <p className='text-base font-semibold'>Complaints</p>
+                </div>
             </Link>
             {/* <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
                 <FaUserFriends className='text-2xl' />

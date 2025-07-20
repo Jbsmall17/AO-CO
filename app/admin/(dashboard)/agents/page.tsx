@@ -1,11 +1,11 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import { IoSearch } from "react-icons/io5";
-import agentPic from "../../_assests/project-profile-image.png"
 import Image from 'next/image';
 import emptyIcon from "../../_assests/emptyIcon.svg"
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { FaUser } from "react-icons/fa";
 
 
 interface AgentObj {
@@ -104,7 +104,7 @@ export default function Page() {
                             />
                         </div>
                     </div>
-                    <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Agent</button>
+                    {/* <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Agent</button> */}
                 </div>
                 {
                     isLoading 
@@ -134,7 +134,13 @@ export default function Page() {
                                             <td className='text-left py-2 md:py-3 lg:py-4 px-4 flex flex-row gap-4 items-center'>
                                                 <input type="checkbox" className='w-5 h-5' />
                                                 <div className='flex flex-row gap-2 items-center'>
-                                                    <Image src={agent.profileImage || agentPic} alt="" className='w-[36px] h-[36px] rounded-full' width="36" height='36' />
+                                                    {
+                                                        agent.profileImage
+                                                        ?
+                                                        <Image src={agent.profileImage} alt="" className='w-[36px] h-[36px] rounded-full' width="36" height='36' />
+                                                        :
+                                                        <FaUser className='w-[36px] h-[36px] rounded-full' />
+                                                    }
                                                     <p>{agent.fullName}</p>
                                                 </div>
                                             </td>

@@ -17,20 +17,7 @@ interface ClientObj {
     }[];
 }
 
-const ClientComp = ({name}:{name: string}) => {
-    return (
-        <div className='rounded-md bg-white h-auto'>
-            <div className='flex flex-row items-stretch h-[36px] border-b-[1.5px]  border-b-[#ececec]'>
-                <div className='flex-1'></div>
-                <p className='flex items-center pl-2 border-l-[1.5px]  border-l-[#ececec] flex-[3] font-semibold text-base'>{name}</p>
-            </div>
-            <div className='pl-2 md:pl-4 lg:pl-6 pb-4 mt-2 md:mt-3 lg:mt-4'>
-                <p className='text-[#8a8a8a] text-base mb-2 mb:mb-3 lg:mb-4'>Open projects</p>
-                <p className='text-[#8a8a8a] text-base'>Open tasks</p>
-            </div>
-        </div>
-    )
-  }
+
 
 export default function Page() {
     const [keyowrd, setKeyword] = useState("");
@@ -39,6 +26,22 @@ export default function Page() {
     const [token, setToken] = useState<string | null>(null);
     const [clients, setClients] = useState<ClientObj[]>([])
     const [isLoading, setIsLoading] = useState(true)
+
+
+    const ClientComp = ({name}:{name: string}) => {
+    return (
+        <div className='rounded-md bg-white h-auto shadow-md hover:shadow-none'>
+            <div className='flex flex-row items-stretch h-[36px] border-b-[1.5px]  border-b-[#ececec]'>
+                <div className='flex-1'></div>
+                <p className='flex items-center pl-2 border-l-[1.5px]  border-l-[#ececec] flex-[3] font-semibold text-base'>{name}</p>
+            </div>
+            <div className='pl-2 md:pl-4 lg:pl-6 pb-4 mt-2 md:mt-3 lg:mt-4'>
+                {/* <p onClick={() => router.push("/admin/clients")} className='cursor-pointer text-[#8a8a8a] text-base mb-2 mb:mb-3 lg:mb-4'>Open projects</p> */}
+                <p className='cursor-pointer text-[#8a8a8a] text-base' onClick={()=>router.push("/admin/tasks")}>Open tasks</p>
+            </div> 
+        </div>
+    )
+  }
 
 
     const getClients = async () =>{
@@ -118,7 +121,7 @@ export default function Page() {
                             />
                         </div>
                     </div>
-                    <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Clients</button>
+                    {/* <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Clients</button> */}
                 </div>
                 {
                     isLoading
