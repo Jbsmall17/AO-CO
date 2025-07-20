@@ -30,12 +30,13 @@ interface taskObj{
 
  function Page() {
     const router = useRouter()
-    const {setIsTaskModalOpen, setTaskId, setActivityId} = useMyContext();
+    const {setIsTaskModalOpen, setTaskId, setActivityId, setIsDeleteTaskModalOpen, isTaskAssigned, setIsTaskAssigned, isTaskDeleted,setIsTaskDeleted} = useMyContext();
     const endpoint = "https://bayog-production.up.railway.app/v1/admin/tasks"
     const [token, setToken] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isTaskLoading, setIsTaskLoading] = useState(true);
     const [tasks, setTasks] = useState<taskObj[]>([]);
     const [statusFilter, setStatusFilter] = useState<string>('all');
+    
     const getTasks = async (filter: string) =>{
         setStatusFilter(filter)
         try{
@@ -52,12 +53,12 @@ interface taskObj{
             console.error("Error fetching tasks:", err);
         }
         finally{
-            setIsLoading(false);
+            setIsTaskLoading(false);
         }
     }
 
     const handleFilter = (filter: string) => {
-        setIsLoading(true);
+        setIsTaskLoading(true);
         getTasks(filter);
     }
 
@@ -100,8 +101,11 @@ interface taskObj{
     useEffect(() => {
         if (token) {
             getTasks('all');
+            setIsTaskAssigned(false)
+            setIsTaskDeleted(false)
+
         }
-    }, [token]);
+    }, [token, isTaskAssigned, isTaskDeleted]);
 
     return (
             <div className='h-full overflow-auto flex-1 rounded-lg border-[1.5px] border-[#b3b3b3] flex flex-col'>
@@ -109,8 +113,11 @@ interface taskObj{
                     <p className='py-3 md:py-5 lg:py-6 text-sm md:text-base leading-none text-[#8a8a8a] hover:text-[#9dc782] hover:border-b hover:border-b-[#9dc782] cursor-pointer'>Companies</p>
                     <p className='py-3 md:py-5 lg:py-6 text-sm md:text-base leading-none text-[#8a8a8a] hover:text-[#9dc782] hover:border-b hover:border-b-[#9dc782] cursor-pointer'>Employees</p>
                 </div>   */}
-                <div className='p-3 md:p-5 lg:p-6 border-b-[1.5px] border-b-[#b3b3b3]'>
+                <div className='flex flex-row justify-between items-center p-3 md:p-5 lg:p-6 border-b-[1.5px] border-b-[#b3b3b3]'>
                         <p className='text-base md:text-xl font-semibold leading-none'>Tasks</p>
+                        <div className='bg-[#485d3a] text-white px-3 py-1 rounded-full text-sm font-medium'>
+                        {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
+                    </div>
                     </div>
                 <div className='p-3 md:p-5 lg:px-6 lg:py-3 flex flex-col md:flex-row justify-between gap-3 md:gap-0 items-center border-b-[1.5px] border-b-[#b3b3b3]'>
                     <div className='flex flex-row gap-4 items-center'>
@@ -126,7 +133,7 @@ interface taskObj{
                     </div>
                     {/* <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Tasks</button> */}
                 </div>
-                <div className='flex flex-col sm:flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
+                <div className='overflow-x-auto mb-4 flex flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
                     <p className='self-start md:self-center text-base font-semibold'>Filter by:</p>
                     <ul className='flex flex-row gap-4 md:gap-6 items-center list-none'>
                         <li 
@@ -154,17 +161,23 @@ interface taskObj{
                             className={`cursor-pointer text-base px-4 md:px-6  py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${statusFilter === 'completed' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
                         >Completed
                         </li>
+                        <li
+                            onClick={() => handleFilter('over-due')}
+                            className={`cursor-pointer text-base px-4 md:px-6  py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${statusFilter === 'over-due' ? 'bg-[#485d3a] text-white' : 'bg-[#e3e2e2] text-[#0f170a]'}`}
+                            >
+                            Overdue
+                        </li>
                     </ul>
                 </div>
                 {
-                    isLoading
+                    isTaskLoading
                     ? <div className='flex-1 flex justify-center items-center'>
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#485d3a]"></div>
                     </div>   
                     : tasks.length > 0
                     ?
-                    <div className='p-3 md:p-5 lg:p-6 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200'>
-                        <div className='overflow-x-auto'>
+                    <div className='mb-4 mx-4 lg:mx-6 m-3 md:m-5 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200'>
+                        <div className='overflow-auto h-[350px]'>
                             <table className='w-full'>
                                 <thead className='bg-gray-50 border-b border-gray-200'>
                                     <tr>
@@ -239,6 +252,10 @@ interface taskObj{
                                                         </button>
                                                     )}
                                                     <button 
+                                                        onClick={()=>{
+                                                            setTaskId(task._id)
+                                                            setIsDeleteTaskModalOpen(true)
+                                                        }}
                                                         className='text-red-600 hover:text-red-900 transition-colors duration-200 p-2 rounded-md hover:bg-red-50 border border-red-200 hover:border-red-300'
                                                        title="Delete task"
                                                     >

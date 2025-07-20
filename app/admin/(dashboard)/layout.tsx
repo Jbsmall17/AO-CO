@@ -6,9 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useMyContext } from '@/app/context/MyContext';
 import TaskModal from '../_components/TaskModal';
 import ComplaintsModal from '../_components/ComplaintsModal';
+import DeleteTaskModal from '../_components/DeleteTaskModal';
 
 export default function Layout({children}: {children: React.ReactNode}) {
-  const {isTaskModalOpen, isComplaintsModalOpen} = useMyContext();
+  const {isTaskModalOpen, isComplaintsModalOpen, isDeleteTaskModalOpen} = useMyContext();
   const [token, setToken] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const router = useRouter();
@@ -50,6 +51,11 @@ export default function Layout({children}: {children: React.ReactNode}) {
         {
           isComplaintsModalOpen && 
             <ComplaintsModal />
+        }
+        {
+          isDeleteTaskModalOpen
+          &&
+          <DeleteTaskModal />
         }
     </main>
   )

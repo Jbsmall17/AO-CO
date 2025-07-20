@@ -1,10 +1,12 @@
 "use client"
 import React, {useEffect, useState } from 'react'
 import { MdUpload } from "react-icons/md";
+import { MdDownload } from "react-icons/md";
 import Image from 'next/image';
 import recentIcon from "../../admin/_assests/recent-icon.svg"
 import uploadIcon from "../../admin/_assests/upload-icon.svg"
 import { toast, Toaster } from 'react-hot-toast';
+import * as XLSX from 'xlsx';
 import{
     Chart as ChartJS,
     CategoryScale,
@@ -42,6 +44,15 @@ interface monthlyTaskType {
     total: number;
 }
 
+interface reportsObj {
+    activityId: string,
+    customerName: string,
+    reportUrl: string,
+    state: string,
+    verificationAddress: string,
+    _id: string
+}
+
 interface DashboardStatsType {
     totalPendingFiles: number;
     totalVerifiedFiles: number;
@@ -51,12 +62,14 @@ interface DashboardStatsType {
     totalVerified: number;
     totalPending: number;
     monthlyTasks: monthlyTaskType[];
+    reports: reportsObj[];   
 }
 export default function Page() {
     const router = useRouter()
     const [token, setToken] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const [isUploading, setIsUploading] = React.useState(false)
+    const [isDownloading, setIsDownloading] = React.useState(false)
     const [fileError, setFileError] = React.useState<string | null>(null)
     const fileInputRef = React.useRef<HTMLInputElement>(null)
     const [dashboardStats, setDashboardStats] = useState<DashboardStatsType>({
@@ -67,7 +80,8 @@ export default function Page() {
         totalRequest: 0,
         totalVerified: 0,
         totalPending: 0,
-        monthlyTasks:[]
+        monthlyTasks:[],
+        reports: []
     })
 
     const getStatusColor = (status: string) => {
@@ -104,7 +118,8 @@ export default function Page() {
                     totalRequest: 0,
                     totalVerified: 0,
                     totalPending: 0,
-                    monthlyTasks: []
+                    monthlyTasks: [],
+                    reports: [] 
                 })
             }
         } catch (error) {
@@ -117,7 +132,8 @@ export default function Page() {
                 totalRequest: 0,
                 totalVerified: 0,
                 totalPending: 0,
-                monthlyTasks: []
+                monthlyTasks: [],
+                reports: []
             })
         } finally {
             setIsLoading(false)
@@ -161,6 +177,78 @@ export default function Page() {
 
     const handleUploadClick = () => {
         fileInputRef.current?.click()
+    }
+
+    const handleDownloadReport = async () => {
+        if (!dashboardStats.reports || dashboardStats.reports.length === 0) {
+            toast.error("No reports available to download");
+            return;
+        }
+
+        setIsDownloading(true);
+        
+        try {
+            // Prepare data for Excel
+            const excelData = dashboardStats.reports.map((report, index) => ({
+                'S/N': index + 1,
+                'Activity ID': report.activityId,
+                'Customer Name': report.customerName,
+                'Verification Address': report.verificationAddress,
+                'State': report.state,
+                'Report URL': report.reportUrl,
+                'Report ID': report._id
+            }));
+
+            // Create a new workbook and worksheet
+            const workbook = XLSX.utils.book_new();
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+            // Set column widths for better readability
+            const columnWidths = [
+                { wch: 5 },   // S/N
+                { wch: 15 },  // Activity ID
+                { wch: 20 },  // Customer Name
+                { wch: 40 },  // Verification Address
+                { wch: 15 },  // State
+                { wch: 50 },  // Report URL
+                { wch: 25 }   // Report ID
+            ];
+            worksheet['!cols'] = columnWidths;
+
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Reports');
+
+            // Generate the Excel file
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            
+            // Create blob and download
+            const blob = new Blob([excelBuffer], { 
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+            });
+            
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            
+            // Generate filename with current date
+            const currentDate = new Date().toISOString().split('T')[0];
+            link.download = `Reports_${currentDate}.xlsx`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+
+            window.URL.revokeObjectURL(url);
+            
+            
+        } catch (error) {
+            console.error('Error generating Excel file:', error);
+            toast.error("Failed to generate report. Please try again.");
+        } finally {
+            setIsDownloading(false);
+        }
     }
 
     const validateExcelFile = (files: FileList) => {
@@ -316,9 +404,21 @@ export default function Page() {
                             <p className='text-red-500 text-sm'>{fileError}</p>
                         )}
                         
-                        {/* <div className='cursor-pointer bg-white rounded-lg py-3 lg:py-5  flex flex-row gap-3 justify-center items-center border-[1.5px] border-[#485d3a] text-[#485d3a]'>
-                            <p className='text-sm sm:text-base font-semibold'>Upload History</p>
-                        </div> */}
+                        <div 
+                            onClick={handleDownloadReport}
+                            className={`cursor-pointer bg-white rounded-lg py-3 lg:py-5 flex flex-row gap-3 justify-center items-center border-[1.5px] border-[#485d3a] text-[#485d3a] transition-all duration-300 ${
+                                isDownloading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#485d3a] hover:text-white'
+                            }`}
+                        >
+                            {isDownloading ? (
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#485d3a]"></div>
+                            ) : (
+                                <MdDownload className='text-xl sm:text-2xl'/>
+                            )}
+                            <p className='text-sm sm:text-base font-semibold'>
+                                {isDownloading ? 'Generating...' : 'Download Report'}
+                            </p>
+                        </div>
                     </div>
                     <div className='flex-1 flex flow-row gap-3 md:gap-4 lg:gap-6'>
                     <Card

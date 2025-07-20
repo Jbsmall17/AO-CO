@@ -30,7 +30,7 @@ export default function Page() {
 
     const ClientComp = ({name}:{name: string}) => {
     return (
-        <div className='rounded-md bg-white h-auto shadow-md hover:shadow-none'>
+        <div className='rounded-md bg-white h-[100px] shadow-md hover:shadow-none'>
             <div className='flex flex-row items-stretch h-[36px] border-b-[1.5px]  border-b-[#ececec]'>
                 <div className='flex-1'></div>
                 <p className='flex items-center pl-2 border-l-[1.5px]  border-l-[#ececec] flex-[3] font-semibold text-base'>{name}</p>
@@ -57,8 +57,7 @@ export default function Page() {
         }catch(err){
             setClients([])
             console.error("Error fetching clients:", err);
-        }
-        finally{
+        }finally{
             setIsLoading(false)
         }
 
@@ -104,8 +103,11 @@ export default function Page() {
                     <p className='py-3 md:py-5 lg:py-6 text-sm md:text-base leading-none text-[#8a8a8a] hover:text-[#9dc782] hover:border-b hover:border-b-[#9dc782] cursor-pointer'>Companies</p>
                     <p className='py-3 md:py-5 lg:py-6 text-sm md:text-base leading-none text-[#8a8a8a] hover:text-[#9dc782] hover:border-b hover:border-b-[#9dc782] cursor-pointer'>Employees</p>
                 </div>   */}
-                <div className='p-3 md:p-5 lg:p-6 border-b-[1.5px] border-b-[#b3b3b3]'>
+                <div className='flex flex-row justify-between items-center p-3 md:p-5 lg:p-6 border-b-[1.5px] border-b-[#b3b3b3]'>
                     <p className='text-base md:text-xl font-semibold leading-none'>Clients</p>
+                    <div className='bg-[#485d3a] text-white px-3 py-1 rounded-full text-sm font-medium'>
+                        {clients.length} {clients.length === 1 ? 'client' : 'clients'}
+                    </div>
                 </div>
                 <div className='p-3 md:p-5 lg:px-6 lg:py-3 flex flex flex-col md:flex-row justify-between gap-3 md:gap-0 items-center border-b-[1.5px] border-b-[#b3b3b3]'>
                     <div className='flex flex-row gap-4 items-center'>
@@ -130,16 +132,17 @@ export default function Page() {
                     </div>
                     : clients.length > 0
                     ?
-                    <div className='flex-1 p-3 md:p-5 lg:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-16 md:pb-20 lg:pb-24'>
-                        {
-                            clients.map((client, index) => (
-                                <ClientComp 
-                                    key={index}
-                                    name={client.companyName}
-                                />
-                            ))
-                        }
-                        
+                    <div className='h-auto md:h-[500px] overflow-hidden p-3 md:p-5 lg:p-6'>
+                        <div className='h-full overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-8 md:pb-12 lg:pb-16'>
+                            {
+                                clients.map((client, index) => (
+                                    <ClientComp 
+                                        key={index}
+                                        name={client.companyName}
+                                    />
+                                ))
+                            }
+                        </div>
                     </div>
                     : 
                     <div className='flex-1 flex justify-center items-center'>

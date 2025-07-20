@@ -93,7 +93,7 @@ export default function Page() {
             </div>
         </div>
         <div className='flex-1 p-4 md:p-6'>
-           <div className='mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
+           <div className='overflow-x-auto mb-4 md:mb-6 lg:mb-8 flex flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
                     <p className='self-start md:self-center text-base font-semibold'>Filter by:</p>
                     <ul className='flex flex-row gap-4 md:gap-6 lg:gap-10 items-center list-none'>
                         <li 
@@ -125,7 +125,7 @@ export default function Page() {
                     </div> 
                 ) : complaints.length > 0 ? (
                     // Complaints table
-                    <div className='overflow-x-auto'>
+                    <div className='overflow-auto h-[350px]'>
                         <table className='w-full'>
                             <thead className='bg-gray-50 border-b border-gray-200'>
                                 <tr>

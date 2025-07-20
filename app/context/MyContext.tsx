@@ -19,6 +19,12 @@ interface MyContextType {
     setRecipientRole: (value: string | null) => void;
     activityId: string | null;
     setActivityId: (value: string | null) => void;
+    isDeleteTaskModalOpen: boolean;
+    setIsDeleteTaskModalOpen: (value: boolean) => void;
+    isTaskAssigned : boolean;
+    setIsTaskAssigned: (value: boolean) => void
+    isTaskDeleted : boolean, 
+    setIsTaskDeleted: (value: boolean) => void
 
 }
 
@@ -33,6 +39,10 @@ export const MyContextProvider = ({children}:{children: ReactNode})=>{
     const [complaintId, setComplaintId] = useState<string | null>(null);
     const [recipientRole, setRecipientRole] = useState<string | null>(null);
     const [activityId, setActivityId] = useState<string | null>(null);
+    const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+    const [isTaskAssigned, setIsTaskAssigned] = useState(false);
+    const [isTaskDeleted, setIsTaskDeleted] = useState(false)
+    
     const toggleSidebar = () => {
         if(window.innerWidth >= 1024) return;
         setIsSidebarOpen(!isSidebarOpen);
@@ -55,7 +65,13 @@ export const MyContextProvider = ({children}:{children: ReactNode})=>{
             recipientRole,
             setRecipientRole,
             activityId,
-            setActivityId
+            setActivityId,
+            isDeleteTaskModalOpen,
+            setIsDeleteTaskModalOpen,
+            isTaskAssigned, 
+            setIsTaskAssigned,
+            isTaskDeleted, 
+            setIsTaskDeleted
         }}>
             {children}
         </myContext.Provider>

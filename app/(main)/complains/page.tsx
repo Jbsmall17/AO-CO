@@ -181,7 +181,7 @@ export default function Page() {
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
                     />
                 </div>
-                <div className='mb-4 md:mb-6 lg:mb-8 flex flex-col sm:flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
+                <div className='overflow-x-auto mb-4 md:mb-6 lg:mb-8 flex flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl'>
                     <p className='self-start md:self-center text-base font-semibold'>Filter by:</p>
                     <ul className='flex flex-row gap-4 md:gap-6 lg:gap-10 items-center list-none'>
                         <li 

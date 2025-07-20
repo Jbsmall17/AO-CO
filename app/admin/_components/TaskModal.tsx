@@ -18,7 +18,7 @@ interface AgentObj {
 
 export default function TaskModal() {
     const token = sessionStorage.getItem("token");
-    const { setIsTaskModalOpen, taskId,setTaskId, activityId } = useMyContext();
+    const { setIsTaskModalOpen, taskId,setTaskId, activityId, setIsTaskAssigned } = useMyContext();
     const [agents, setAgents] = useState<AgentObj[]>([]);
     const [agentId, setAgentId] = useState<string>("");
     const [loading,setLoading] = useState(false)
@@ -51,10 +51,13 @@ export default function TaskModal() {
                 }
             });
             if (response.status === 200) {
-                toast.success(response.data.message);
-                // setIsTaskModalOpen(false);
-                setAgentId("");
-                // setTaskId(null);
+                toast.success("Task assigned successfully");
+                setIsTaskAssigned(true)
+                setTimeout(()=>{
+                    setIsTaskModalOpen(false);
+                    setAgentId("");
+                    setTaskId(null);
+                }, 1000)
             }
         } catch (error: any) {
             console.error("Error assigning task:", error);
