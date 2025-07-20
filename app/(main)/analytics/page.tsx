@@ -202,7 +202,7 @@ export default function Page() {
                 <div className='mb-4 md:mb-6 lg:mb-8 relative h-auto'>
                     <IoSearch className='text-xl text-[#8a8a8a] absolute top-[50%] -translate-y-[50%] left-8' />
                     <input 
-                        type="text" 
+                        type="text"
                         placeholder='Search by address, reference number' 
                         className='w-full pl-16 py-3 pr-2 bg-white rounded-2xl outline-none'
                     />
@@ -241,8 +241,10 @@ export default function Page() {
                     </select>  */}
                 </div>    
                 <div className='flex flex-col sm:flex-row gap-4 md:gap-6 gap-8'>
-                <div className="py-3 md:py-4 lg:py-5 flex-1 min-h-[250px] sm:min-h-[350px] lg:min-h-[450px]">
+                <div className='overflow-x-auto'>
+                <div className="py-3 md:py-4 lg:py-5 sm:flex-1 h-[450px] min-w-[350px]">
                     <Line data={chartData.lineData} options={chartOptions.lineOptions} />
+                </div>
                 </div>
                 <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                     <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>
@@ -290,8 +292,10 @@ export default function Page() {
                     </select>  */}
                 </div>
                 <div className='py-4 md:py-5 lg:py-7 flex flex-col sm:flex-row gap-4 md:gap-6 gap-8'>
-                    <div className="flex-1">
+                   <div className='overflow-x-auto'>
+                    <div className="sm:flex-1 h-[350px] min-w-[400px]">
                         <Bar data={chartData.barData} options={chartOptions.barOptions} />
+                    </div>
                     </div>
                     <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                         <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>

@@ -107,7 +107,7 @@ export default function Page() {
 
     const Complain = ({title,desc,date,time,status,id}:  ComplainType) => {
         return (
-            <div className='mb-3 md:mb-4 lg:mb-6 px-4 md:px-6 py-4 md:py-6 rounded-xl bg-white'>
+            <div className='min-w-[400px] mb-3 md:mb-4 lg:mb-6 px-4 md:px-6 py-4 md:py-6 rounded-xl bg-white h-auto'>
                 <div className='flex flex-row justify-between items-center mb-2 md:mb-3 lg:mb-4'>
                     <p className='text-base font-semibold'>{title}</p>
                     <p className={`px-4 py-2 rounded-full text-white ${getStatusColor(status)} hover:opacity-80`}>{status}</p>
@@ -273,7 +273,7 @@ export default function Page() {
                         onClick={() => setLoadMore(!loadMore)}
                         className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
                         {
-                            loadMore ? "Show Less Complains" : "Load More Complains"
+                            loadMore ? "Show Less" : "Load More"
                         }
                     </button>
                 }

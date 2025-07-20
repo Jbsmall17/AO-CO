@@ -31,7 +31,7 @@ interface MyContextType {
 const myContext = createContext<MyContextType | undefined>(undefined)
 
 export const MyContextProvider = ({children}:{children: ReactNode})=>{
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [taskId, setTaskId] = useState<string | null>(null);
     const [isComplaintsModalOpen, setIsComplaintsModalOpen] = useState(false);

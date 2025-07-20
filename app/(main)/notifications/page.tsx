@@ -60,12 +60,16 @@ export default function Page() {
 
     const Notifications = ({title,message,date,time}:NotificationsType) =>{
         return (
-            <div className='mb-2 md:mb-4 bg-white rounded-xl px-6 md:px-8 lg:px-10 py-2 md:py-3 lg:py-4 flex flex-row justify-between items-center gap-4 md:gap-6 lg:gap-8'>
+            <div className='min-w-[400px] mb-2 md:mb-4 bg-white rounded-xl px-6 md:px-8 lg:px-10 py-2 md:py-3 lg:py-4 flex flex-row justify-between items-center gap-4 md:gap-6 lg:gap-8'>
                 <div className='flex flex-row gap-4 lg:gap-6 items-center'>
                     <IoChatbubbles className='shrink-0 text-2xl md:text-3xl text-black' />
                     <div>
                         <p className='text-base sm:text-xl font-semibold mb-2'>{title}</p>
-                        <p className='text-sm sm:text-base text-[#626262]'>{message}</p>
+                        <p className='text-sm sm:text-base text-[#626262]'>{
+                            message.length > 40
+                            ? `${message.substring(0,40)}...`
+                            :message}
+                        </p>
                     </div>
                 </div>
                 <div className='self-stretch flex flex-col justify-between gap-4 md:gap-6 lg:gap-10'>
@@ -246,7 +250,7 @@ export default function Page() {
                         onClick={() => setLoadMore(!loadMore)}
                         className='mx-auto block text-sm py-3 px-16 md:px-20 lg:px-24 rounded-full text-white bg-[#178a51] cursor-pointer hover:opacity-80'>
                         {
-                            loadMore ? "Show Less Notifications" : "Load More Notifications"
+                            loadMore ? "Show Less" : "Load More"
                         }
                     </button>                    
                 }

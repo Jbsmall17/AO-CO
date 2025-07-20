@@ -35,14 +35,17 @@ export default function Sidebar() {
 
 
     return (
-    <div className={`h-screen lg:h-auto absolute top-0 left-0 lg:relative z-10 shrink-0 w-[200px] xl:w-[250px] bg-white px-3 pt-8 lg:pt-6 ${isSidebarOpen ? "block": "hidden"}`}>
+    <div className={`h-screen lg:h-auto absolute top-0 left-0 lg:relative z-10 shrink-0 w-[200px] xl:w-[250px] bg-white px-3 pt-8 lg:pt-6 ${isSidebarOpen ? 'block' 
+    : !isSidebarOpen && window.innerWidth >= 1024
+    ? "block" 
+    :'hidden'}`}>
         <IoMdClose 
             onClick={toggleSidebar}
             className='cursor-pointer text-2xl lg:hidden absolute top-4 right-4' 
         />
         <div 
             className='cursor-pointer mb-4 md:mb-6 lg:mb-8 flex justify-center items-center'
-            onClick={()=> {handleRouter('/dashboard')}}
+            onClick={()=> {handleRouter('/dashboard'); setIsSidebarOpen(false)}}
             >
             <Image 
                 src={bayog} 
@@ -54,25 +57,25 @@ export default function Sidebar() {
         <ul className='flex flex-col gap-6'>
             <li 
                 className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/dashboard' ? ' bg-[#485d3a] text-white' : ''}`}
-                onClick={()=>handleRouter('/dashboard')}
+                onClick={()=> {handleRouter('/dashboard'); setIsSidebarOpen(false)}}
                 >
                 <RiDashboardHorizontalFill className='text-2xl' />
                 <p className='text-base font-semibold'>Dashboard</p>
             </li>
             <li 
-                onClick={()=>handleRouter('/notifications')}
+                onClick={()=>{handleRouter('/notifications');setIsSidebarOpen(false)}}
                 className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/notifications' ? ' bg-[#485d3a] text-white' : ''}`}>
                 <IoIosCheckmarkCircle className='text-2xl' />
                 <p className='text-base font-semibold'>Notifications</p>
             </li>
             <li 
-                onClick={()=>handleRouter('/analytics')}
+                onClick={()=>{handleRouter('/analytics');setIsSidebarOpen(false)}}
                 className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/analytics' ? ' bg-[#485d3a] text-white' : ''} `}>
                 <IoAnalyticsSharp className='text-2xl' />
                 <p className='text-base font-semibold'>Analytics</p>
             </li>
             <li 
-                onClick={()=>handleRouter('/complains')}
+                onClick={()=>{handleRouter('/complains');setIsSidebarOpen(false)}}
                 className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/complains' ? ' bg-[#485d3a] text-white' : ''}`}>
                 <PiUserSoundFill className='text-2xl' />
                 <p className='text-base font-semibold'>Complains</p>

@@ -145,11 +145,11 @@ export default function Page() {
                                 />
                                 <PiEyeSlashLight
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-                                    className={`${!showConfirmPassword ? "absolute top-[50%] right-2 -translate-y-[50%]" : "hidden"}`} 
+                                    className={`${!showConfirmPassword ? "absolute top-[50%] right-2 -translate-y-[50%] cursor-pointer" : "hidden"}`} 
                                 />
                                 <PiEyeLight
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
-                                    className={`${!showConfirmPassword ? "hidden" : "absolute top-[50%] right-2 -translate-y-[50%]"}`}  
+                                    className={`${!showConfirmPassword ? "hidden" : "absolute top-[50%] right-2 -translate-y-[50%] cursor-pointer"}`}  
                                 />    
                             </div>
                             {errors.confirmPassword && (
@@ -173,7 +173,14 @@ export default function Page() {
                         <p className="text-red-500 text-sm">{errors.termsAccepted.message}</p>
                     )}
                     <div className='flex justify-center items-center mt-6'>
-                        <button disabled={isLoading} className='h-[40px] w-[215px] rounded-md bg-[#485d3a] text-white hover:opacity-80 cursor-pointer'>
+                        <button 
+                            disabled={isLoading} 
+                            className={`h-[40px] w-[215px] rounded-md text-white font-medium transition-all duration-300 transform ${
+                                isLoading 
+                                    ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                                    : 'bg-[#485d3a] hover:bg-[#3a4a2e] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer'
+                            }`}
+                        >
                            {
                             isLoading ? 
                             "Loading..." 

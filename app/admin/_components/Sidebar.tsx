@@ -25,7 +25,7 @@ export default function Sidebar() {
     const handleLogout = () => {
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
-        router.push('/login');
+        router.push('/admin/login');
     }
 
     useEffect(()=>{
@@ -41,7 +41,10 @@ export default function Sidebar() {
     }, [])
 
   return (
-    <div className={`${isSidebarOpen ? 'block' : 'hidden'} absolute z-10 top-0 left-0 md:shadow-xl lg:shadow-none md:shadow-md lg:shadow-none lg:relative w-[225px] rounded-tr-xl rounded-br-xl lg:rounded-none border lg:border-[1.5px] border-l-0 border-[#b3b3b3] pt-4 md:pt-10 pb-6 pl-6 pr-4 bg-[#abe08a] lg:bg-white`}>
+    <div className={`${isSidebarOpen ? 'block' 
+    : !isSidebarOpen && window.innerWidth >= 1024
+    ? "block" 
+    :'hidden'} absolute z-10 top-0 left-0 md:shadow-xl lg:shadow-none md:shadow-md lg:shadow-none lg:relative w-[225px] rounded-tr-xl rounded-br-xl lg:rounded-none border lg:border-[1.5px] border-l-0 border-[#b3b3b3] pt-4 md:pt-10 pb-6 pl-6 pr-4 bg-[#abe08a] lg:bg-white`}>
         <IoMdClose
             onClick={toggleSidebar}
             className='cursor-pointer absolute text-2xl block top-4 right-4 lg:hidden' 
@@ -49,7 +52,7 @@ export default function Sidebar() {
         <Image
             src={logo}
             height={50}
-            alt="bayog logo"
+            alt="bayog log"
             className='block md:hidden'
         />
         <div className='flex flex-row gap-2 items-center'>
@@ -62,31 +65,36 @@ export default function Sidebar() {
             <p className='text-base text-black'>{user?.email}</p>
         </div>
         <div className='cursor-pointer flex flex-col gap-2 items-stretch mt-4'>
-            <Link href='/admin/dashboard' 
+            <Link href='/admin/dashboard'
+                onClick={()=>setIsSidebarOpen(false)}
                 className={`rounded-md hover:bg-[#9dc782] p-2 hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/dashboard')}`}>
                 <RiDashboardHorizontalFill className='text-2xl' />
                 <p className='text-base font-semibold'>Dashboard</p>
             </Link>
             <Link  href={'/admin/tasks'} 
+                onClick={()=>setIsSidebarOpen(false)}
                 className={`rounded-md hover:bg-[#9dc782] p-2 hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/tasks')}`}>
                 <FaUserFriends className='text-2xl' />
                 <p className='text-base font-semibold'>Tasks</p>
             </Link>
             <Link href={'/admin/clients'} 
+                onClick={()=>setIsSidebarOpen(false)}
                 className={`rounded-md hover:bg-[#9dc782] p-2 hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/clients')}`}>
                 <FaUserFriends className='text-2xl' />
                 <p className='text-base font-semibold'>Client</p>
             </Link>
-            <Link href={'/admin/agents'} 
+            <Link href={'/admin/agents'}
+                onClick={()=>setIsSidebarOpen(false)} 
                 className={`rounded-md hover:bg-[#9dc782] p-2 hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/agents')}`}>
                 <RiFileList2Fill className='text-2xl' />
                 <p className='text-base font-semibold'>Agents</p>
             </Link>
-            <Link href={'/admin/complaints'}>
-                <div className={`rounded-md hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/complaints')}`}>
-                    <RiAlarmWarningFill className='text-2xl' />
-                    <p className='text-base font-semibold'>Complaints</p>
-                </div>
+            <Link href={'/admin/complaints'}
+                onClick={()=>setIsSidebarOpen(false)}
+                className={`rounded-md hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear ${isActive('/admin/complaints')}`}>
+                <RiAlarmWarningFill className='text-2xl' />
+                <p className='text-base font-semibold'>Complaints</p>
+
             </Link>
             {/* <div className='rounded-md bg-[#f5f5f5] hover:bg-[#9dc782] p-2 text-[#8a8a8a] hover:text-white flex flex-row gap-2 items-center transition-all duration-300 ease-linear'>
                 <FaUserFriends className='text-2xl' />

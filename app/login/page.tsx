@@ -93,7 +93,12 @@ export default function Page() {
                     </div>
                     <div className='flex justify-center items-center'>
                         <button
-                            className='cursor-pointer py-3 px-14 rounded-md bg-[#485d3a] hover:opacity-80 text-white transition-all duration-500 ease-linear'
+                            disabled={isLoading}
+                            className={`py-3 px-14 rounded-md text-white font-medium transition-all duration-300 transform ${
+                                isLoading 
+                                    ? 'bg-gray-400 cursor-not-allowed opacity-70' 
+                                    : 'bg-[#485d3a] hover:bg-[#3a4a2e] hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer'
+                            }`}
                         >   {
                             isLoading ? "Loading..." : "Sign In"
                         }

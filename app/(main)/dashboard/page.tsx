@@ -420,7 +420,7 @@ export default function Page() {
                             </p>
                         </div>
                     </div>
-                    <div className='flex-1 flex flow-row gap-3 md:gap-4 lg:gap-6'>
+                    <div className='flex-1 flex flex-col sm:flex-row gap-3 md:gap-4 lg:gap-6'>
                     <Card
                         number={dashboardStats.totalPendingFiles}
                         desc={"Files pending"}
@@ -448,12 +448,12 @@ export default function Page() {
                     </div>       
                 {
                     isLoading 
-                    ? <div className='flex-1 flex justify-center items-center'>
+                    ? <div className='flex justify-center items-center h-[200px] md:h-[300px] lg:h-[400px]'>
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#485d3a]"></div>
                     </div>
                     : dashboardStats.uploads.length > 0
                     ?
-                    <>
+                    <div className='overflow-x-auto'>
                     <table className='w-full'>
                             <thead>
                                 <tr className='border-b border-b-[#c4c4c4]'>
@@ -476,7 +476,7 @@ export default function Page() {
                                 }
                             </tbody>
                     </table>
-                    </>
+                    </div>
                     :
                     <div className='flex-1 flex justify-center items-center'>
                             <div className='max-w-[300px] flex flex-col gap-2 items-center'>
@@ -496,8 +496,10 @@ export default function Page() {
                             <option value="yearly">Yearly</option>
                         </select> */}
                         <div className='flex flex-col sm:flex-row gap-3 lg:gap-4 md:gap-6 gap-8'>
-                            <div className="py-3 md:py-4 lg:py-5 w-full">
+                            <div className='overflow-x-auto'>
+                            <div className="py-3 md:py-4 lg:py-5 w-full h-[300px] min-w-[400px]">
                                 <Line data={chartData} options={chartOptions} />
+                            </div>
                             </div>
                             <div className="self-start sm:self-end py-4 px-6 lg:px-8 border border-[#8a8a8a] rounded-md min-w-[225px]">
                                 <div className='flex flex-col gap-4 pb-3 border-b border-[#8a8a8a] mb-3'>
