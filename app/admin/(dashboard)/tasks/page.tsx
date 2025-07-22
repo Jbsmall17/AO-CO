@@ -6,9 +6,40 @@ import Image from "next/image";
 import emptyIcon from "../../_assests/emptyIcon.svg";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { useMyContext } from "@/app/context/MyContext";
 import * as XLSX from "xlsx";
 import toast, { Toaster } from "react-hot-toast";
+import ViewReportModal from "../../_components/ViewReportModal";
+import TaskModal from "../../_components/TaskModal";
+import DeleteTaskModal from "../../_components/DeleteTaskModal";
+import RejectTaskModal from "../../_components/RejectTaskModal";
+
+interface GeoMappingData {
+    addressExistence: string;
+    addressResidential: string;
+    areaProfile: string;
+    buildingColor: string;
+    buildingType: string;
+    comments: string;
+    customerKnown: string;
+    customerRelationshipWithAddress: string;
+    customerResident: string;
+    easeOfLocation: string;
+    geoMapping: {
+        lat: number;
+        lng: number;
+    };
+    geotaggedImages: string[];
+    landMark: string;
+    metWith: string;
+    nameOfPersonMet: string;
+    personMetOthers: string;
+    receivedDate: string;
+    recordedAudio: string;
+    recordedVideo: string;
+    relatioshipWithCustomer: string;
+    reportUrl: string;
+    visitFeedback: string;
+}
 
 interface feedbackObj {
   addressExistence: string;
@@ -56,19 +87,6 @@ interface taskObj {
 
 function Page() {
   const router = useRouter();
-  const {
-    setIsTaskModalOpen,
-    setTaskIds,
-    setActivityId,
-    setIsDeleteTaskModalOpen,
-    isTaskAssigned,
-    setIsTaskAssigned,
-    isTaskDeleted,
-    setIsTaskDeleted,
-    setIsViewReportModalOpen,
-    setReportData,
-    setIsRejectTaskModalOpen,
-  } = useMyContext();
   const endpoint = "https://bayog-production.up.railway.app/v1/admin/tasks";
   const [token, setToken] = useState<string | null>(null);
   const [isTaskLoading, setIsTaskLoading] = useState(true);
@@ -79,6 +97,14 @@ function Page() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
   const [keyword, setKeyword] = useState('')
+  const [reportData, setReportData] = useState<GeoMappingData | null>(null);
+  const [taskIds, setTaskIds] = useState<string[]>([]);
+  const [isViewReportModalOpen, setIsViewReportModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [activityId, setActivityId] = useState<string | null>(null);
+  const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
+  const [isRejectTaskModalOpen, setIsRejectTaskModalOpen] = useState(false);
+  console.log(taskIds)
   // console.log(selectedTasks.length)
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) =>{
@@ -391,6 +417,25 @@ function Page() {
     }
   };
 
+  const handleViewReportModalClose = () => {
+    setIsViewReportModalOpen(false);
+    setReportData(null);
+    setTaskIds([]);
+  };
+
+  const handleTaskModalClose = () => {
+    setIsTaskModalOpen(false);
+    setTaskIds([]);
+  }
+
+  const handleDeleteModalClose = () => {
+    setIsDeleteTaskModalOpen(false);
+    setTaskIds([]);
+  }
+  const handleRejectModalClose = () => {
+    setIsRejectTaskModalOpen(false)
+    setTaskIds([])
+  }
 
 
   useEffect(() => {
@@ -405,10 +450,8 @@ function Page() {
   useEffect(() => {
     if (token) {
       getTasks("all");
-      setIsTaskAssigned(false);
-      setIsTaskDeleted(false);
     }
-  }, [token, isTaskAssigned, isTaskDeleted]);
+  }, [token]);
 
   return (
     <>
@@ -597,6 +640,41 @@ function Page() {
             </div>
           </div>
         )}
+        {
+          isViewReportModalOpen &&
+          <ViewReportModal
+            handleClose={handleViewReportModalClose}
+            getTasks={() =>getTasks("all")}
+            reportData={reportData}
+            taskIds={taskIds}
+            />
+        }
+        {
+          isTaskModalOpen && 
+          <TaskModal 
+            getTasks={() => getTasks("all")}
+            taskIds={taskIds}
+            handleClose={handleTaskModalClose}
+            activityId={activityId}
+          />
+        }
+        {
+          isDeleteTaskModalOpen
+          &&
+          <DeleteTaskModal 
+            getTasks={() => getTasks("all")}
+            taskIds={taskIds}
+            handleClose={handleDeleteModalClose}
+          />
+        }
+        {isRejectTaskModalOpen && (
+          <RejectTaskModal
+            getTasks={() => getTasks("all")}
+            taskIds={taskIds}
+            handleClose={handleRejectModalClose}
+            />
+        )}
+
       </div>
     </>
   );

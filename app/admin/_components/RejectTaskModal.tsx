@@ -1,12 +1,16 @@
-import { useMyContext } from '@/app/context/MyContext'
 import axios from 'axios'
 import { X } from 'lucide-react'
 import React, { ChangeEvent, useState } from 'react'
 import toast from 'react-hot-toast'
 
-export default function RejectTaskModal() {
+interface rejectModalTask{
+  taskIds: string[],
+  handleClose: () => void,
+  getTasks : () => void
+}
+
+export default function RejectTaskModal({taskIds, handleClose,getTasks}: rejectModalTask) {
     const token = sessionStorage.getItem('token')
-    const {setIsRejectTaskModalOpen, setTaskIds, taskIds} = useMyContext()
     const [isLoading,setIsLoading] = useState(false)
     const [comments, setComments] = useState('')
     // console.log(taskIds, comments)
@@ -15,10 +19,6 @@ export default function RejectTaskModal() {
         setComments(e.target.value)
     }
 
-    const handleClose = () => {
-        setIsRejectTaskModalOpen(false)
-        setTaskIds([])
-    }
 
     const rejectTask = () => {
         if(comments == "") return
@@ -34,9 +34,9 @@ export default function RejectTaskModal() {
         ).then((res)=>{
             if(res.status === 200){
                 toast.success(res.data.message)
+                getTasks()
                 setTimeout(()=>{
-                    setIsRejectTaskModalOpen(false)
-                    setTaskIds([])
+                  handleClose()
                 },1000)
             }
         })

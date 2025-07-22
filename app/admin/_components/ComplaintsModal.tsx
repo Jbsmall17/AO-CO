@@ -1,14 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { useMyContext } from '@/app/context/MyContext';
 import { X } from "lucide-react"
 import axios from 'axios';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
-export default function ComplaintsModal() {
+
+interface ComplainObj {
+    _id: string;
+    role: string;
+    userId: {
+        _id: string,
+        email: string
+    },
+    complaintID: string,
+    subject: string,
+    message: string,
+    status: string,
+}
+
+interface ComplaintsModalType{
+    handleClose : () => void, 
+    complaint : ComplainObj,
+    getComplaints: () => void
+}
+
+
+export default function ComplaintsModal({handleClose, complaint, getComplaints}:ComplaintsModalType) {
     const token = sessionStorage.getItem("token");
-    const { setIsComplaintsModalOpen, recipientId, setRecipientId, complaintId, setComplaintId, recipientRole, setRecipientRole, compId, setCompId, setIsNotSent } = useMyContext();
     const [notificationObj, setNotificationObj] = useState({ title: '', message: '', type: "" });
     const [loading, setLoading] = useState(false);
 
@@ -18,30 +37,22 @@ export default function ComplaintsModal() {
     }
 
 
-    const handleClose = () => {
-        setIsComplaintsModalOpen(false);
-        setRecipientId(null);
-        setComplaintId(null);
-        setNotificationObj({ title: '', message: '', type: "" });
-        setRecipientRole(null);
-        setCompId(null);
-    }
 
 
     const postNotification = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const endpoint = "https://bayog-production.up.railway.app/v1/admin/send-notifications"
 
-        if(notificationObj.message === '' || notificationObj.title === '' || recipientId === null || complaintId === null)
+        if(notificationObj.message === '' || notificationObj.title === '' || complaint.userId._id === '' || complaint._id === "")
             return;
         setLoading(true);
         try{
             const response = await axios.post(endpoint, {
-            recipientId,
+            recipientId : complaint.userId._id,
             title: notificationObj.title,
             body: notificationObj.message,
-            complaintId,
-            recipientRole : recipientRole?.toLowerCase(),
+            complaintId: complaint._id,
+            recipientRole : complaint.role.toLowerCase(),
             type: notificationObj.type
         }, {
             headers: {
@@ -50,8 +61,8 @@ export default function ComplaintsModal() {
         })
             if(response.status === 201){
                 setNotificationObj({ title: '', message: '', type: "" });
-                setIsNotSent(true)
                 toast.success("Notification sent successfully");
+                getComplaints()
             }
         } catch(err: any){
             toast.error(err.response ? err.response.data.message : "Failed to send notification");
@@ -60,15 +71,11 @@ export default function ComplaintsModal() {
         }
     }
 
-    useEffect(()=>{
-        setIsNotSent(false)
-    },[])
-
   return (
     <div className='fixed inset-0 flex items-center justify-center w-full h-full z-10'>
         <Toaster />
         <div 
-            onClick={() => { setIsComplaintsModalOpen(false); setRecipientId(null); }}
+            onClick={handleClose}
             className='absolute top-0 left-0 w-full h-full bg-black opacity-70'
         ></div>
         <div className='relative z-20 bg-white rounded-lg pt-4 px-4 pb-8 max-w-xl w-full max-h-[80vh] overflow-y-auto'>
@@ -77,7 +84,7 @@ export default function ComplaintsModal() {
             <form onSubmit={postNotification} className='space-y-6'>
                 <div className='pl-0 sm:pl-4 md:pl-6 flex flex-row items-center font-semibold text-base pb-2 border-b border-b-black'>
                     <p className='flex-1'>Complaint ID</p>
-                    <p className='flex-[1.5] text-center'>{compId}</p>
+                    <p className='flex-[1.5] text-center'>{complaint.complaintID}</p>
                 </div>
                 <div className='pl-0 sm:pl-4 md:pl-6 flex flex-col sm:flex-row sm:items-center'>
                     <label className='flex-1 font-semibold text-base'>Title</label>

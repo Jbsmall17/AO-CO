@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { useMyContext } from '@/app/context/MyContext';
 import axios from 'axios';
 import React, {FormEvent, useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
@@ -16,10 +15,16 @@ interface AgentObj {
     completedTaskCount: number;
 }
 
+interface taskModalType {
+    handleClose : () => void,
+    taskIds : string[],
+    activityId: string | null,
+    getTasks: () => void
+}
 
-export default function TaskModal() {
+
+export default function TaskModal({handleClose,taskIds,activityId,getTasks} : taskModalType) {
     const token = sessionStorage.getItem("token");
-    const { setIsTaskModalOpen, taskIds,setTaskIds, activityId, setIsTaskAssigned } = useMyContext();
     const [agents, setAgents] = useState<AgentObj[]>([]);
     const [agentId, setAgentId] = useState<string>("");
     const [loading,setLoading] = useState(false)
@@ -55,11 +60,9 @@ export default function TaskModal() {
             });
             if (response.status === 200) {
                 toast.success(response.data.message);
-                setIsTaskAssigned(true)
+                getTasks()
                 setTimeout(()=>{
-                    setIsTaskModalOpen(false);
-                    setAgentId("");
-                    setTaskIds([]);
+                    handleClose()
                 }, 1000)
             }
         } catch (error: any) {
@@ -70,11 +73,6 @@ export default function TaskModal() {
         }
     }
 
-    const handleClose = () => {
-        setIsTaskModalOpen(false);
-        setTaskIds([]);
-        setAgentId("");
-    }
 
     useEffect(() => {
         if(token) {

@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
-import { useMyContext } from '@/app/context/MyContext';
 import axios from 'axios';
 import React, { useState } from 'react'
 import toast, {Toaster} from "react-hot-toast"
 import { X } from "lucide-react"
 
-export default function DeleteTaskModal() {
+interface deleteTaskModal {
+    taskIds : string[],
+    handleClose: ()=>void,
+    getTasks: () => void
+}
+
+export default function DeleteTaskModal({taskIds,handleClose, getTasks}: deleteTaskModal) {
     const token = sessionStorage.getItem("token")
-    const { setIsDeleteTaskModalOpen, taskIds, setTaskIds, setIsTaskDeleted } = useMyContext();
     const [isTaskDeleting, setIsTaskDeleting] = useState(false);
-    const handleClose = () => {
-        setIsDeleteTaskModalOpen(false);
-        setTaskIds([]);
-    }
 
     const deleteTask = async () => {
         const endpoint = "https://bayog-production.up.railway.app/v1/admin/delete-task"
@@ -26,10 +26,9 @@ export default function DeleteTaskModal() {
             })
             if(response.status === 200){
                 toast.success(response.data.message);
-                setIsTaskDeleted(true)
+                getTasks()
                 setTimeout(()=>{
-                    setIsDeleteTaskModalOpen(false)
-                    setTaskIds([])
+                    handleClose()
                 },1000)
             }
         }catch(err : any){

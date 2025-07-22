@@ -15,13 +15,51 @@ import {
   CheckCircle,
 } from "lucide-react";
 import Image from "next/image";
-import { useMyContext } from "@/app/context/MyContext";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function ViewReportModal() {
-    const token = sessionStorage.getItem("token");
-  const { reportData, setIsViewReportModalOpen, setReportData, setTaskIds, taskIds } = useMyContext();
+interface GeoMappingData {
+  addressExistence: string;
+  addressResidential: string;
+  areaProfile: string;
+  buildingColor: string;
+  buildingType: string;
+  comments: string;
+  customerKnown: string;
+  customerRelationshipWithAddress: string;
+  customerResident: string;
+  easeOfLocation: string;
+  geoMapping: {
+    lat: number;
+    lng: number;
+  };
+  geotaggedImages: string[];
+  landMark: string;
+  metWith: string;
+  nameOfPersonMet: string;
+  personMetOthers: string;
+  receivedDate: string;
+  recordedAudio: string;
+  recordedVideo: string;
+  relatioshipWithCustomer: string;
+  reportUrl: string;
+  visitFeedback: string;
+}
+
+interface viewReportModalProps {
+  getTasks: () => void;
+  handleClose: () => void;
+  reportData: GeoMappingData | null;
+  taskIds: string[];
+}
+
+export default function ViewReportModal({
+  getTasks,
+  handleClose,
+  reportData,
+  taskIds,
+}: viewReportModalProps) {
+  const token = sessionStorage.getItem("token");
   const [isApproving, setIsApproving] = useState(false);
   const formatValue = (
     value: string | number | boolean | string[] | null | undefined
@@ -41,13 +79,14 @@ export default function ViewReportModal() {
   const handleApprovedReport = async () => {
     if (!reportData) return;
     if (reportData.geotaggedImages.length >= 1) {
-      const endpoint = "https://bayog-production.up.railway.app/v1/admin/approve-report";
+      const endpoint =
+        "https://bayog-production.up.railway.app/v1/admin/approve-report";
       setIsApproving(true);
       try {
         const res = await axios.post(
           endpoint,
           {
-            taskIds: taskIds
+            taskIds: taskIds,
           },
           {
             headers: {
@@ -58,10 +97,9 @@ export default function ViewReportModal() {
         if (res.status === 200) {
           toast.success(res.data.message);
           setTimeout(() => {
-            setIsViewReportModalOpen(false);
-            setReportData(null);
-            setTaskIds([]);
+            handleClose();
           }, 1000);
+          getTasks();
         }
       } catch (err: any) {
         toast.error(
@@ -71,12 +109,6 @@ export default function ViewReportModal() {
         setIsApproving(false);
       }
     }
-  };
-
-  const handleClose = () => {
-    setIsViewReportModalOpen(false);
-    setReportData(null);
-    setTaskIds([]);
   };
 
   const formatDate = (dateString: string) => {
@@ -319,9 +351,7 @@ export default function ViewReportModal() {
                 className="cursor-pointer disabled:cursor-not-allowed px-6 py-2 bg-[#485d3a] text-white rounded-lg hover:bg-[#3a4a2e] hover:shadow-lg active:scale-95 transition-all duration-200"
               >
                 <CheckCircle className="inline mr-2" />
-                {
-                    isApproving ? "Approving..." : "Approve Report"
-                }
+                {isApproving ? "Approving..." : "Approve Report"}
               </button>
             )}
           </div>

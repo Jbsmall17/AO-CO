@@ -3,15 +3,8 @@ import React, { useEffect } from 'react'
 import Header from '../_components/Header'
 import Sidebar from '../_components/Sidebar'
 import { useRouter } from 'next/navigation';
-import { useMyContext } from '@/app/context/MyContext';
-import TaskModal from '../_components/TaskModal';
-import ComplaintsModal from '../_components/ComplaintsModal';
-import DeleteTaskModal from '../_components/DeleteTaskModal';
-import ViewReportModal from '../_components/ViewReportModal';
-import RejectTaskModal from '../_components/RejectTaskModal';
 
 export default function Layout({children}: {children: React.ReactNode}) {
-  const {isTaskModalOpen, isComplaintsModalOpen, isDeleteTaskModalOpen, isViewReportModalOpen, isRejectTaskModalOpen} = useMyContext();
   const [token, setToken] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const router = useRouter();
@@ -46,28 +39,6 @@ export default function Layout({children}: {children: React.ReactNode}) {
             <Sidebar />
             {children}
         </section>
-        {
-          isTaskModalOpen && 
-          <TaskModal />
-        }
-        {
-          isComplaintsModalOpen && 
-            <ComplaintsModal />
-        }
-        {
-          isDeleteTaskModalOpen
-          &&
-          <DeleteTaskModal />
-        }
-        {
-           isViewReportModalOpen &&
-          <ViewReportModal
-          />
-        }
-        {isRejectTaskModalOpen && (
-            <RejectTaskModal
-            />
-        )}
     </main>
   )
 }

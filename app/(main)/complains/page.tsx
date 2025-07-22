@@ -48,8 +48,8 @@ export default function Page() {
     const [loadMore, setLoadMore] = useState(false);
     const [keyword, setKeyword] = useState('');
     const [complainType, setComplainType] = useState('all');
-    const [isComplaintCreated, setIsComplaintCreated] = useState(false)
-    console.log(isComplaintCreated)
+
+    
     const handleSearch = async (value : string) => {
         setKeyword(value)
         const endpoint = `${baseUrl}?search=${value}`
@@ -96,7 +96,7 @@ export default function Page() {
             toast.success(response.data.message);
             setValue("title", "");
             setValue("desc", "");
-            setIsComplaintCreated(true)
+            getComplains("all")
         })
         .catch((error) => {
             toast.error(error.response ? error.response.data.message : "An error occurred while submiting....");
@@ -166,12 +166,9 @@ export default function Page() {
 
     useEffect(()=>{
         if(token){
-            getComplains("all");
-            if(isComplaintCreated){
-                setIsComplaintCreated(false)
-            }
+            getComplains("all")
         }
-    },[token, isComplaintCreated])
+    },[token])
 
   return (
         <div>

@@ -1,10 +1,10 @@
 "use client"
-import { useMyContext } from '@/app/context/MyContext';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { Eye, Bell } from 'lucide-react';
 import ViewComplainModal from '../../_components/ViewComplainModal';
+import ComplaintsModal from '../../_components/ComplaintsModal';
 
 
 
@@ -23,7 +23,6 @@ interface ComplainObj {
 
 
 export default function Page() {
-    const { setIsComplaintsModalOpen, setRecipientId, setComplaintId, setRecipientRole,setCompId, isNotSent } = useMyContext();
     const router = useRouter();
     const [token, setToken] = useState<string | null>(null);
     const [isLoadingComplains, setIsLoadingComplains] = useState(true);
@@ -34,6 +33,19 @@ export default function Page() {
         message: ""
     })
     const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+    const [isComplaintsModalOpen, setIsComplaintsModalOpen] = useState(false);
+    const [complaintObj, setComplaintObj] = useState({
+        _id: '',
+        role: '',
+        userId: {
+            _id: "",
+            email: ""
+        },
+        complaintID: "",
+        subject: "",
+        message: "",
+        status: "",
+    })
 
     const getComplaints = async (type:string) => {
         setComplainType(type);
@@ -61,6 +73,19 @@ export default function Page() {
             subject: complaint.subject,
             message: complaint.message
         })
+        if(complaint.status === "resolved") return
+        const endpoint = `https://bayog-production.up.railway.app/v1/admin/view-complaint/${complaint._id}`
+        axios.post(endpoint,{},{
+            headers: {
+                Authorization : `Bearer ${token}`
+            }   
+        })
+        .then(()=>{
+            getComplaints('all');
+        })
+        .catch((err)=>{
+            console.error(err.response ? err.response.data.message : 'error occurred')
+        })
     }
 
 
@@ -82,6 +107,21 @@ export default function Page() {
         }
     }
 
+    const handleClose = () => {
+        setIsComplaintsModalOpen(false);
+        setComplaintObj({
+        _id: '',
+        role: '',
+        userId: {
+            _id: "",
+            email: ""
+        },
+        complaintID: "",
+        subject: "",
+        message: "",
+        status: "",
+    })
+    }
 
     useEffect(() => {
         const storedToken = sessionStorage.getItem("token");
@@ -96,7 +136,7 @@ export default function Page() {
         if (token) {
             getComplaints('all');
         }
-    }, [token, isNotSent]);
+    }, [token]);
 
   return (
     <div className='flex-1 overflow-auto rounded-lg border-[1.5px] border-[#b3b3b3] flex flex-col'>
@@ -206,10 +246,9 @@ export default function Page() {
                                             <button 
                                                 onClick={() => {
                                                     setIsComplaintsModalOpen(true);
-                                                    setRecipientId(complaint.userId._id);
-                                                    setComplaintId(complaint._id);
-                                                    setCompId(complaint.complaintID);
-                                                    setRecipientRole(complaint.role);
+                                                    setComplaintObj({
+                                                        ...complaint
+                                                    })
                                                 }}
                                                 className="cursor-pointer p-2 text-blue-600 hover:text-blue-900 transition-colors duration-200 border border-blue-200 rounded-md" 
                                                 title="Send Notification"
@@ -244,9 +283,18 @@ export default function Page() {
         {
             isViewModalOpen
             &&
-            <ViewComplainModal 
+            <ViewComplainModal
+                title='Complaints Details' 
                 isClose={()=> setIsViewModalOpen(false)}
                 complainObjInfo={complainObjInfo}
+            />
+        }
+        {
+            isComplaintsModalOpen && 
+            <ComplaintsModal
+                getComplaints={()=>getComplaints('all')}
+                handleClose={handleClose}
+                complaint={complaintObj}
             />
         }
     </div>

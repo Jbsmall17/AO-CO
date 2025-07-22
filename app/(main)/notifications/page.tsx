@@ -5,6 +5,7 @@ import emptyIcon from "../../admin/_assests/emptyIcon.svg"
 import Image from 'next/image'
 import axios from 'axios'  
 import { useRouter } from 'next/navigation'
+import ViewComplainModal from '@/app/admin/_components/ViewComplainModal'
 
 interface CardType {
     num: string;
@@ -47,6 +48,11 @@ export default function Page() {
     const [loadMore, setLoadMore] = useState(false)
     const [keyword, setKeyword] = useState("")
     const [messageType, setMessageType] = useState("")
+    const [isMessageOpen, setIsMessageOpen] = useState(false)
+    const [messageObj, setMessageObj] = useState({
+        subject: "",
+        message: ""
+    })
 
 
     const Card = ({num,type,color,borderColor}:CardType)=>{
@@ -57,8 +63,14 @@ export default function Page() {
             </div>
         )
     }
-
     const Notifications = ({title,message,date,time}:NotificationsType) =>{
+        const handleOpenMessage = () => {
+        setIsMessageOpen(true)
+        setMessageObj({     
+            subject: title,
+            message: message
+        })
+    }
         return (
             <div className='min-w-[400px] mb-2 md:mb-4 bg-white rounded-xl px-6 md:px-8 lg:px-10 py-2 md:py-3 lg:py-4 flex flex-row justify-between items-center gap-4 md:gap-6 lg:gap-8'>
                 <div className='flex flex-row gap-4 lg:gap-6 items-center'>
@@ -78,7 +90,11 @@ export default function Page() {
                         <span>|</span>
                         <span>{time}</span>
                     </p>
-                    <button className='py-3 sm:py-4 px-2 sm:px-3 text-base font-semibold bg-white border-[1.5px] border-black rounded-lg'>Open message</button>
+                    <button 
+                        onClick={()=>handleOpenMessage()}
+                        className='py-3 px-2 cursor-pointer hover:bg-gray-200 sm:px-3 text-base font-semibold bg-white border-[1.5px] border-black rounded-lg'>
+                        Open message
+                    </button>
                 </div>
             </div>
         )
@@ -267,6 +283,15 @@ export default function Page() {
                 </div>    
             </div>
             }
+            {
+                isMessageOpen
+                &&
+                <ViewComplainModal
+                    title="Message"
+                    isClose={()=>setIsMessageOpen(false)}
+                    complainObjInfo={messageObj}
+                />
+            }        
         </>
   )
 }
