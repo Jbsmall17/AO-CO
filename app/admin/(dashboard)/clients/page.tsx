@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
 interface ClientObj {
+    id: string;
     companyName: string;
     email: string;
     uploaderName: string;
@@ -28,7 +29,7 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState(true)
 
 
-    const ClientComp = ({name}:{name: string}) => {
+    const ClientComp = ({name, id}:{name: string, id: string}) => {
     return (
         <div className='rounded-md bg-white h-[100px] shadow-md hover:shadow-none'>
             <div className='flex flex-row items-stretch h-[36px] border-b-[1.5px]  border-b-[#ececec]'>
@@ -37,7 +38,7 @@ export default function Page() {
             </div>
             <div className='pl-2 md:pl-4 lg:pl-6 pb-4 mt-2 md:mt-3 lg:mt-4'>
                 {/* <p onClick={() => router.push("/admin/clients")} className='cursor-pointer text-[#8a8a8a] text-base mb-2 mb:mb-3 lg:mb-4'>Open projects</p> */}
-                <p className='cursor-pointer text-[#8a8a8a] text-base' onClick={()=>router.push("/admin/tasks")}>Open tasks</p>
+                <p className='cursor-pointer text-[#8a8a8a] text-base inline' onClick={()=>router.push(`/admin/clients/${id}`)}>Client History</p>
             </div> 
         </div>
     )
@@ -139,6 +140,7 @@ export default function Page() {
                                     <ClientComp 
                                         key={index}
                                         name={client.companyName}
+                                        id={client.id}
                                     />
                                 ))
                             }

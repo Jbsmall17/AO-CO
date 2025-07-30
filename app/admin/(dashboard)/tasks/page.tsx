@@ -105,14 +105,29 @@ function Page() {
   const [activityId, setActivityId] = useState<string | null>(null);
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const [isRejectTaskModalOpen, setIsRejectTaskModalOpen] = useState(false);
-  console.log(taskIds)
+  const [currentFilter, setCurrentFilter] = useState("all")
+  const [dateObj, setDateObj] = useState({
+    startDate: "",
+    endDate: ""
+  })
+  console.log(dateObj)
   // console.log(selectedTasks.length)
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) =>{
+    const {name,value} = e.target
+
+    setDateObj({
+      ...dateObj,
+      [name] : value
+    })
+  }
+
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) =>{
     const endpoint = "https://bayog-production.up.railway.app/v1/admin/tasks"
     setKeyword(e.target.value)
     setIsTaskLoading(true)
-    axios.get(`${endpoint}?search=${e.target.value}`,{
+    axios.get(`${endpoint}?search=${e.target.value}&statusFilter=${currentFilter}`,{
         headers : {
             Authorization: `Bearer ${token}`
         }
@@ -366,7 +381,7 @@ function Page() {
     setStatusFilter(filter);
     try {
       const response = await axios.get(
-        `${filter === "all" ? endpoint : `${endpoint}?statusFilter=${filter}`}`,
+        `${endpoint}?statusFilter=${filter}&search=${keyword}&startDate=${dateObj.startDate}&endDate=${dateObj.endDate}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -386,6 +401,7 @@ function Page() {
 
   const handleFilter = (filter: string) => {
     setIsTaskLoading(true);
+    setCurrentFilter(filter)
     getTasks(filter);
   };
 
@@ -455,9 +471,12 @@ function Page() {
 
   useEffect(() => {
     if (token) {
+      if(!isTaskLoading){
+        setIsTaskLoading(true);
+      }
       getTasks("all");
     }
-  }, [token]);
+  }, [token, dateObj.startDate, dateObj.endDate]);
 
   return (
     <>
@@ -491,7 +510,28 @@ function Page() {
               />
             </div>
           </div>
-          {/* <button className='bg-[#9dc782] text-white text-base rounded-lg py-2 px-4'>Add New Tasks</button> */}
+          <div className="flex flex-row gap-4">
+            <div className="flex flex-col gap-1">
+              <span>Start Date</span>
+              <input 
+                type="date"
+                name="startDate"
+                value={dateObj.startDate}
+                onChange={handleChange}
+                className="p-2 border border-[#b3b3b3] rounded-md"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span>End Date</span>
+              <input 
+                type="date"
+                name="endDate"
+                value={dateObj.endDate}
+                onChange={handleChange}
+                className="p-2 border border-[#b3b3b3] rounded-md"
+              />
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto flex flex-row gap-4 lg:gap-10 items-center px-4 lg:px-6 py-3 bg-white rounded-xl">
           <p className="self-start md:self-center text-base font-semibold">
