@@ -243,6 +243,7 @@ function Page() {
         );
         if (res.status === 200) {
           toast.success(res.data.message);
+          getTasks("completed")
         }
       } catch (err: any) {
         toast.error(
@@ -499,14 +500,14 @@ function Page() {
             <p className="text-black font-semibold text-sm sm:text-base">
               {tasks.length} tasks
             </p>
-            <div className="relative h-auto flex-1 md:w-[250px]">
+            <div className="relative h-auto flex-1 md:w-[250px] lg:w-[350px]">
               <Search className="absolute text-[#8a8a8a] top-[50%] -translate-y-[50%] left-2" />
               <input
                 value={keyword}
                 onChange={handleSearch}
                 type="text"
                 className="text-black w-full border-0 border-white rounded-xl border-[1.5px] bg-white text-[#8a8a8a] py-2 pl-8 pr-2"
-                placeholder="search  tasks"
+                placeholder="actvity id, address and company"
               />
             </div>
           </div>
@@ -567,16 +568,6 @@ function Page() {
               }`}
             >
               Pending
-            </li>
-            <li
-              onClick={() => handleFilter("in-progress")}
-              className={`cursor-pointer text-base whitespace-nowrap px-4 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${
-                statusFilter === "in-progress"
-                  ? "bg-[#485d3a] text-white"
-                  : "bg-[#e3e2e2] text-[#0f170a]"
-              }`}
-            >
-              In Progress
             </li>
             <li
               onClick={() => handleFilter("completed")}

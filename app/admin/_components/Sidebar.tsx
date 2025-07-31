@@ -15,7 +15,7 @@ export default function Sidebar() {
     const {isSidebarOpen,setIsSidebarOpen ,toggleSidebar} = useMyContext()
 
     const isActive = (path: string) => {
-        return pathname === path ? 'bg-[#9dc782] text-white' : 'bg-[#f5f5f5] text-[#8a8a8a]';
+        return pathname.includes(path) ? 'bg-[#9dc782] text-white' : 'bg-[#f5f5f5] text-[#8a8a8a]';
     }
 
     const handleLogout = () => {
