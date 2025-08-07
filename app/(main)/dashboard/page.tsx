@@ -196,7 +196,6 @@ export default function Page() {
                 'Verification Address': report.verificationAddress,
                 'State': report.state,
                 'Visit Feedback': report.visitFeedback,
-                'Report URL': report.reportUrl,
             }));
 
             // Create a new workbook and worksheet
@@ -227,10 +226,9 @@ export default function Page() {
                 { wch: 20 },
                 { wch: 20 },
                 { wch: 20 },
-                { wch: 40 },  // Verification Address
-                { wch: 15 },  // State
-                { wch: 20 },   // Report ID
-                { wch: 50 },  // Report URL
+                { wch: 40 },  
+                { wch: 15 },  
+                { wch: 20 },   
             ];
             worksheet['!cols'] = columnWidths;
 
