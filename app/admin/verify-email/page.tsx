@@ -17,7 +17,6 @@ function VerificationContent() {
     
     const verifyEmail = async () => {
         try {
-            setIsVerifying(true);
             const response = await axios.post(endpoint);
             console.log(response.data);
             if(response.status == 200){

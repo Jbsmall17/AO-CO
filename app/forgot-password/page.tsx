@@ -10,7 +10,7 @@ type resetFormInput = {
     email: string
 }
 
-export default function page() {
+export default function Page() {
     const { register, handleSubmit, formState: { errors } } = useForm<resetFormInput>();
     const [isLoading,setIsLoading] = useState(false)
 

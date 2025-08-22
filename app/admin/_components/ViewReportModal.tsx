@@ -313,24 +313,44 @@ export default function ViewReportModal({
 
           {/* Report Links */}
           {reportData.reportUrl && (
-            <InfoSection title="Report Links" icon={ExternalLink}>
-              <div className="flex flex-col sm:flex-row sm:items-center">
-                <span className="font-medium text-gray-700 sm:w-1/3 mb-1 sm:mb-0">
-                  Report URL:
-                </span>
-                <div className="sm:w-2/3">
-                  <a
-                    href={reportData.reportUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 hover:underline break-all inline-flex items-center"
-                  >
-                    <ExternalLink className="mr-1" />
-                    View Full Report
-                  </a>
+            <>
+              <InfoSection title="Report Links" icon={ExternalLink}>
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <span className="font-medium text-gray-700 sm:w-1/3 mb-1 sm:mb-0">
+                    Report URL:
+                  </span>
+                  <div className="sm:w-2/3">
+                    <a
+                      href={reportData.reportUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 hover:underline break-all inline-flex items-center"
+                    >
+                      <ExternalLink className="mr-1" />
+                      View Full Report
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </InfoSection>
+              </InfoSection>
+              <InfoSection title="Google Map" icon={MapPin}>
+                <div className="flex flex-col sm:flex-row sm:items-center">
+                  <span className="font-medium text-gray-700 sm:w-1/3 mb-1 sm:mb-0">
+                    Address URL:
+                  </span>
+                  <div className="sm:w-2/3">
+                    <a
+                      href={`https://www.google.com/maps?q=${reportData.geoMapping.lat},${reportData.geoMapping.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 hover:underline break-all inline-flex items-center"
+                    >
+                      <ExternalLink className="mr-1" />
+                      View address
+                    </a>
+                  </div>
+                </div>
+              </InfoSection>
+            </>
           )}
         </div>
 
