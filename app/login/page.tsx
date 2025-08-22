@@ -67,7 +67,7 @@ export default function Page() {
                     {errors.email?.message == "Invalid email address" && (
                         <p className='text-red-500 text-sm mb-3'>{errors.email.message}</p>
                     )}
-                    <div className='flex flex-row gap-8 mb-8'>
+                    <div className='flex flex-row gap-8'>
                         <div className='flex-1'>
                             <label className='mb-2 block text-sm font-semibold' htmlFor="password">Password</label>
                             <div className="relative mb-3 w-full">
@@ -91,6 +91,10 @@ export default function Page() {
                             </div>                         
                         </div>
                     </div>
+                    <div className='mb-8'>
+                        <a href='/forgot-password'>Forgot password?</a>
+                    </div>
+
                     <div className='flex justify-center items-center'>
                         <button
                             disabled={isLoading}

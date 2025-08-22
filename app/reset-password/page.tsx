@@ -1,39 +1,42 @@
 "use client"
-import React, { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import Image from 'next/image';
+import axios from 'axios'
+import Image from 'next/image'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { Suspense, useEffect } from 'react'
 
 
-function VerificationContent() {
-    const searchParams = useSearchParams();
-    const token = searchParams.get('token');
+function VerifyTokenComp(){
+    const searchParams = useSearchParams()
+    const token = searchParams.get("token")
     const router = useRouter();
     const [isVerifying, setIsVerifying] = React.useState(true);
     const [verificationStatus, setVerificationStatus] = React.useState<'loading' | 'success' | 'error'>('loading');
-
-    const endpoint = `https://bayog-production.up.railway.app/v1/auth/verify-email-from-link?token=${token}`;
     
-    const verifyEmail = async () => {
-        try {
-            const response = await axios.post(endpoint);
-            console.log(response.data);
-            if(response.status == 200){
-                setVerificationStatus('success');
-                setTimeout(() => {
-                    router.push('/admin/login');
-                }, 2000); 
-            }
-        } catch (error) {
+    const endpoint = `https://bayog-production.up.railway.app/v1/auth/verify-reset-link?token=${token}`
+
+    const verifyEmail = () => {
+        axios.post(endpoint)
+        .then((response)=>{
+             if(response.status === 200){
+            setVerificationStatus('success');
+            setTimeout(() => {
+                sessionStorage.setItem("resetObj", JSON.stringify(response.data.data))
+                router.push('/reset-password-form');
+            }, 2000);
+        } else {
+            setVerificationStatus('error');
+        }
+        })
+        .catch((error)=>{
             console.error("Error verifying email:", error);
             setVerificationStatus('error');
-        } finally {
+        })
+        .finally(()=>{
             setIsVerifying(false);
-        }
+        })
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (token) {
             verifyEmail();
         } else {
@@ -64,18 +67,18 @@ function VerificationContent() {
                     verificationStatus === 'error' ? 'text-red-600' : 'text-gray-800'
                 }`}>
                     {verificationStatus === 'loading' && 'Your email is being verified...Please wait'}
-                    {verificationStatus === 'success' && 'Email verified successfully! Redirecting to login...'}
+                    {verificationStatus === 'success' && 'Email verified successfully! Redirecting to reset password form...'}
                     {verificationStatus === 'error' && 'Email verification failed. Please try again.'}
                 </p>
                 {isVerifying && (
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#485d3a]"></div>
                 )}
-            </div>
+            </div>    
         </main>
-    );
+    )
 }
-
-function VerificationFallback() {
+ 
+function VerifyTokenFallback(){
     return (
         <main className='relative min-h-screen px-4 md:px-6 lg:px-8 xl:px-10 max-w-screen-2xl mx-auto'>
             <Image
@@ -97,13 +100,13 @@ function VerificationFallback() {
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#485d3a]"></div>
             </div>
         </main>
-    );
+    )
 }
 
 export default function Page() {
-    return (
-        <Suspense fallback={<VerificationFallback />}>
-            <VerificationContent />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<VerifyTokenFallback />}>
+      <VerifyTokenComp />
+    </Suspense>
+  )
 }
