@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bayog Website",
-  description: "Bayog website portal",
+  title: "Abayomi Ogunjimi & CO",
+  description: "AO & CO's website",
 };
 
 export default function RootLayout({
