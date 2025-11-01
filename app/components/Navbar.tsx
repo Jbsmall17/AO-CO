@@ -1,7 +1,6 @@
 "use client"
 import Link from 'next/link';
 import React, { useState } from 'react'
-import logo from '../assests/logo.png'
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -16,10 +15,11 @@ const Navbar = () => {
       <div>
         <Link href='/'>
           <Image 
-            src={logo} 
+            src={'/logo.png'} 
             alt='bayog logo' 
-            height={60}
-            className='cursor-pointer'
+            width={200}
+            height={100}
+            className='cursor-pointer object-contain'
           />
         </Link>
       </div>

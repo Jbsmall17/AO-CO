@@ -4,7 +4,6 @@ import React, { useEffect } from 'react'
 import { LayoutDashboard, FileText, AlertTriangle, Users, User, X, LogOut } from "lucide-react";
 import Image from 'next/image'
 import { useMyContext } from '@/app/context/MyContext';
-import logo from "@/app/assests/logo.png"
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -46,9 +45,10 @@ export default function Sidebar() {
             className='cursor-pointer absolute text-2xl block top-4 right-4 lg:hidden' 
         />
         <Image
-            src={logo}
+            src={'/logo.png'}
+            width={200}
             height={50}
-            alt="bayog log"
+            alt="AO and CO logo"
             className='block md:hidden'
         />
         <div className='flex flex-row gap-2 items-center'>

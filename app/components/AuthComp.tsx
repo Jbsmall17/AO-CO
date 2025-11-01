@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import React from 'react'
-import logo from "../assests/logo.png"
 import Link from 'next/link'
 
 export default function AuthComp() {
@@ -8,8 +7,9 @@ export default function AuthComp() {
     <div className=' hidden md:block relative leading-none flex-1 bg-[#f5f9f2] text-[#0f170a] p-6 md:p-8 lg:p-10 pt-6'>
       <Link href="/">
       <Image 
-        src={logo} 
-        alt='bayog logo' 
+        src={"/logo.png"} 
+        alt='AO and CO logo' 
+        width={200}
         height={60}
         className='cursor-pointer'
       />

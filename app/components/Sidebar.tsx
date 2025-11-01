@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect } from 'react'
-import bayog from "../assests/logo.png"
 import Image from "next/image"
 import { LayoutDashboard, CheckCircle, BarChart3, MessageSquareWarning, X } from 'lucide-react';
 import { useMyContext } from '../context/MyContext';
@@ -44,8 +43,9 @@ export default function Sidebar() {
             onClick={()=> {handleRouter('/dashboard'); setIsSidebarOpen(false)}}
             >
             <Image 
-                src={bayog} 
-                alt="company logo" 
+                src={'/logo.png'} 
+                alt="AO and CO logo"
+                width={200} 
                 height={60}
                 />
         </div>

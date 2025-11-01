@@ -1,5 +1,4 @@
 import React from 'react'
-import logo from "../assests/logo.png"
 import Image from 'next/image'
 import { Mail } from 'lucide-react';
 import Link from 'next/link';
@@ -11,11 +10,12 @@ const Footer = () => {
   return (
     <>
         <footer className="footer px-[5%] sm:footer-horizontal bg-[#ffffff] text-base-content p-10">
-            <aside className='first-column'>
+            <aside className='first-column space-y-2'>
                 <Link href='/'>
                     <Image 
-                        src={logo} 
-                        alt='bayog logo' 
+                        src={"/logo.png"} 
+                        alt='AO and CO logo'
+                        width={200} 
                         height={60}
                         className='cursor-pointer'
                     />
