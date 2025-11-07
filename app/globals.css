@@ -81,3 +81,9 @@ div > canvas{
   width: 100% !important;
   height: 100% !important
 }
+
+@layer {
+  .image {
+    @apply w-[150px] md:w-[175px] lg:w-[200px];
+  }
+}

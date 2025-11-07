@@ -14,7 +14,7 @@ const Page = () => {
                     Admin! Ready to take charge and keep verifications running smoothly?
                 </p>
                 <p className='text-base mb-10 font-normal lg:w-[400px]'>
-                    Log in to manage requests, assign agents, and ensure every address gets the bayog touch of trust
+                    Log in to manage requests, assign agents, and ensure every address gets the AO & CO touch of trust
                 </p>
                 <div className='flex flex-row gap-6'>
                     <Link href="/admin/signup" className='cursor-pointer px-5 py-4 rounded-lg text-white bg-[#485d3a] hover:opacity-85 active:opacity-85 transition-all duration-300 ease-linear'>

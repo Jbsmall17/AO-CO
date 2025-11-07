@@ -27,7 +27,7 @@ const page = () => {
                     <div className='mb-4 h-8 w-8 text-base font-semibold flex justify-center items-center text-white rounded-full bg-[#485d3a]'>01</div>
                     <p className='mb-4 text-base text-[#485d3a] font-semibold'>Sign Up</p>
                     <p className='text-base text-[#0f170a] md:w-[300px] lg:w-[350px]'>
-                        Start by creating a free Bayog account using your name, email, and company details.
+                        Start by creating a free AO & CO account using your name, email, and company details.
                         This gives you access to your personal dashboard where you can begin uploading addresses for verification.
                     </p>
                 </div>
@@ -37,7 +37,7 @@ const page = () => {
                     <p className='mb-4 text-base text-[#485d3a] font-semibold'>Upload Documents</p>
                     <p className='text-base text-[#0f170a] md:w-[300px] lg:w-[350px]'>
                         Once signed in, easily upload an Excel file containing the list of addresses you want verified.
-                        Bayog instantly processes your file and prepares each address for assignment to a field agent.
+                        AO & CO instantly processes your file and prepares each address for assignment to a field agent.
                     </p>
                 </div>
             </div>

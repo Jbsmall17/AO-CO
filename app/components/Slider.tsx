@@ -38,7 +38,7 @@ const Slider = () => {
             <SliderItem 
                 image={sliderImg1}
                 name={"Mrs Wunmi, Eko Electricy"}
-                review={"Bayog are fast and very reliable. They have saved us from numerous scams"}
+                review={"AO and CO are fast and very reliable. They have saved us from numerous scams"}
             />
             <SliderItem 
                 image={sliderImg2}
@@ -48,7 +48,7 @@ const Slider = () => {
             <SliderItem 
                 image={sliderImg3}
                 name={"Mr. Leke, Eko Electricty"}
-                review={"Bayog are fast and very reliable. They have saved us from numerous scams"}
+                review={"AO and CO are fast and very reliable. They have saved us from numerous scams"}
             />
         </div>
     </section>

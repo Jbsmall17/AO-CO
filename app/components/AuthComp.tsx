@@ -11,7 +11,7 @@ export default function AuthComp() {
         alt='AO and CO logo' 
         width={200}
         height={60}
-        className='cursor-pointer'
+        className='cursor-pointer object-contain image'
       />
       </Link>
       <div className='px-10 w-full absolute top-[50%] left-[50%] -translate-[50%]'>

@@ -46,7 +46,7 @@ function VerificationContent() {
         <main className='relative min-h-screen px-4 md:px-6 lg:px-8 xl:px-10 max-w-screen-2xl mx-auto'>
             <Image
                 src="/logo.png"
-                alt="Bayog Logo"
+                alt="AO & CO Logo"
                 className='w-[125px]'
                 width={125}
                 height={50}
@@ -80,7 +80,7 @@ function VerificationFallback() {
         <main className='relative min-h-screen px-4 md:px-6 lg:px-8 xl:px-10 max-w-screen-2xl mx-auto'>
             <Image
                 src="/logo.png"
-                alt="Bayog Logo"
+                alt="AO & CO Logo"
                 className='w-[125px]'
                 width={125}
                 height={50}

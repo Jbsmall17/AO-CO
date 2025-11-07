@@ -47,6 +47,7 @@ export default function Sidebar() {
                 alt="AO and CO logo"
                 width={200} 
                 height={60}
+                className='object-contain image'
                 />
         </div>
         <p className='text-center mb-4 sm:mb-6 md:mb-8 lg:mb-10 text-base font-semibold text-[#2d3429]'>Verification Portal</p>

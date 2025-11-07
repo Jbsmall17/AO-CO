@@ -16,41 +16,41 @@ const Navbar = () => {
         <Link href='/'>
           <Image 
             src={'/logo.png'} 
-            alt='bayog logo' 
+            alt='AO and CO logo' 
             width={200}
             height={100}
-            className='cursor-pointer object-contain'
+            className='cursor-pointer object-contain image'
           />
         </Link>
       </div>
         <ul className='hidden sm:flex sm:w-[50%] md:w-[45%] lg:w-[30%] justify-between items-center'>
             <li 
-              className={`relative h-[28px] pb-1.5 cursor-pointer text-[#0f170a] ${pathname == "/" ? "border-b-2 border-b-[#485d3a]" : "test-link"} text-base font-medium whitespace-nowrap`}
+              className={`relative h-[28px] pb-1.5 cursor-pointer text-[#0f170a] ${pathname == "/" ? "border-b-2 border-b-[#485d3a]" : "test-link"} text-sm lg:text-base font-medium whitespace-nowrap`}
             >
               <Link  href="/">Home</Link>
             </li>
             <li  
-              className={`relative  ${pathname == "/howitworks" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer text-[#0f170a] text-base font-medium whitespace-nowrap`}
+              className={`relative  ${pathname == "/howitworks" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer text-[#0f170a] text-sm lg:text-base font-medium whitespace-nowrap`}
             >
               <Link href="/howitworks">How it Works</Link>
             </li>
-            <li className={`relative  ${pathname == "/admin" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer ext-[#0f170a] text-base font-medium whitespace-nowrap`}>
+            <li className={`relative  ${pathname == "/admin" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer ext-[#0f170a] text-sm lg:text-base font-medium whitespace-nowrap`}>
                 <Link href="/admin">Admin</Link>
             </li>
-            <li className={`relative ${pathname == "/aboutus" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer text-[#0f170a] text-base font-medium whitespace-nowrap`}>
+            <li className={`relative ${pathname == "/aboutus" ? "border-b-2 border-b-[#485d3a]" : "test-link"} h-[28px] pb-1.5 cursor-pointer text-[#0f170a] text-sm lg:text-base font-medium whitespace-nowrap`}>
                 <Link href="/aboutus">About Us</Link>
             </li>
         </ul>
         <div className='hidden sm:flex items-center'>
             <button>
                 <Link
-                  className='translate-x-2 w-[90px] md:w-[98px] h-[36px] flex justify-center items-center text-[#0f170a] text-base font-medium hover:border hover:border-r-0 hover:border-[#485d3a] rounded-tl-lg rounded-bl-lg  transition-all duration-500 ease-linear'
+                  className='translate-x-2 w-[90px] md:w-[98px] h-[28px] lg:h-[36px] flex justify-center items-center text-[#0f170a] text-sm lg:text-base font-medium hover:border hover:border-r-0 hover:border-[#485d3a] rounded-tl-lg rounded-bl-lg  transition-all duration-500 ease-linear'
                   href='/login'>Login
                 </Link>
             </button>
             <button>
                 <Link  
-                  className='w-[90px] md:w-[98px] h-[36px] flex justify-center items-center text-white text-base font-medium bg-[#485d3a] rounded-lg hover:bg-white hover:text-[#485d3a] hover:border-2 hover:border-[#485d3a] transition-all duration-500 ease-linear' href="/signup">
+                  className='w-[90px] md:w-[98px] h-[28px] lg:h-[36px] flex justify-center items-center text-white text-sm lg:text-base font-medium bg-[#485d3a] rounded-lg hover:bg-white hover:text-[#485d3a] hover:border-2 hover:border-[#485d3a] transition-all duration-500 ease-linear' href="/signup">
                     Sign Up
                 </Link>
               </button>

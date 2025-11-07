@@ -49,7 +49,7 @@ export default function Sidebar() {
             width={200}
             height={50}
             alt="AO and CO logo"
-            className='block md:hidden'
+            className='block md:hidden object-contain image'
         />
         <div className='flex flex-row gap-2 items-center'>
             {/* <Image 

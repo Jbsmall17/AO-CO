@@ -14,9 +14,9 @@ const page = () => {
             <div className='flex-[2] lg:flex-[3]'>
                 <p className='text-3xl mb-4 font-semibold text-center md:text-start'>About Us</p>
                 <p className='text-base md:text-xl lg:w-[650px] mb-4 text-center md:text-start'>
-                    Bayog is a leading customer verification agency dedicated to helping businesses confirm the authenticity of their clients&apos; 
+                    AO & CO is a leading customer verification agency dedicated to helping businesses confirm the authenticity of their clients&apos; 
                     addresses. We bridge the gap between trust and truth by sending trained agents to physically verify residential and business locations. 
-                    With real-time updates, photo evidence, and detailed reports, we make verification fast, reliable, and stress-free. At Bayog, we believe that accurate 
+                    With real-time updates, photo evidence, and detailed reports, we make verification fast, reliable, and stress-free. At AO & CO, we believe that accurate 
                     information builds stronger, safer, and more transparent customer relationships.
                 </p>
                 <p className='text-base md:text-xl lg:w-[650px] mb-4 text-center md:text-start'>
@@ -34,7 +34,7 @@ const page = () => {
                 <div className='flex-[2]'>
                     <p className='text-2xl font-semibold mb-4'>Our Mission</p>
                     <p className='text-base md:w-[320px]'>
-                        Our mission at Bayog is to build trust through accurate and reliable address verification.
+                        Our mission at AO & CO is to build trust through accurate and reliable address verification.
                         We are committed to helping businesses make informed decisions by delivering real-world, 
                         on-site confirmations with speed, clarity, and transparency.
                     </p> 
@@ -68,7 +68,7 @@ const page = () => {
                     <p className='text-xl font-semibold mb-6'>Info</p>
                     <div className='ml-2 flex flex-row gap-6 items-center mb-6'>
                         <Mail className='text-xl' />
-                        <p>Bayogassociates@gmail.com</p> 
+                        <p>aoandcoconsultancy@gmail.com</p> 
                     </div>
                     <div className='ml-2 flex flex-row gap-6 items-center mb-6'>
                         <Phone className='text-xl' />

@@ -64,7 +64,7 @@ export default function Page() {
       <Link href="/">
         <Image
           src="/logo.png"
-          alt="Bayog Logo"
+          alt="AO and CO Logo"
           width={125}
           height={50}
         />

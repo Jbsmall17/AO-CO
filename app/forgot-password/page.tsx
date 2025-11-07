@@ -39,7 +39,7 @@ export default function Page() {
         >
         <Image
             src="/logo.png"
-            alt="Bayog Logo"
+            alt="AO and CO Logo"
             className='w-[125px]'
             width={125}
             height={50}
@@ -48,7 +48,7 @@ export default function Page() {
         <div className='flex-1 flex justify-center items-center'>
             <form onSubmit={handleSubmit(onSubmit)} className='w-[90%] md:w-1/2 lg:w-1/3'>
                 <p className='text-xl font-semibold text-[#485d3a] text-center mb-2'>Reset Password</p>
-                <p className='text-center font-light mb-2'>Enter your mail registered with Bayog</p>
+                <p className='text-center font-light mb-2'>Enter your mail registered with AO and CO</p>
                 <div className='space-y-3 flex flex-col'>
                     <label htmlFor='email'>Email address</label>
                     <input

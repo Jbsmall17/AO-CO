@@ -22,6 +22,7 @@ export default function Header() {
             width={200}
             height={60}
             alt="AO and CO logo"
+            className='object-contain image'
         />
         <div className='hidden md:flex flex-row gap-2 items-center'>
             <div onClick={handleLogout} className='cursor-pointer rounded-lg p-2 border-2 border-[#9fe273] flex flex-row gap-3 items-center hover:border-red-500 hover:bg-red-500 hover:text-white'>
