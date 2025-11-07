@@ -43,7 +43,7 @@ const Footer = () => {
             <aside className="grid-flow-col items-center">
                 <Image src={copyright} alt="copyright" className='inline-block' />
                 <p className='text-[#b1d29b]'> 
-                    {new Date().getFullYear()} AO and CO Associates. All right reserved
+                    {new Date().getFullYear()} AO and CO. All right reserved
                 </p>
             </aside>
             <nav className="grid-flow-col gap-8 md:place-self-center md:justify-self-end">
