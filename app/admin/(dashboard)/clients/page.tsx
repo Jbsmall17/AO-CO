@@ -1,10 +1,12 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import { Search } from 'lucide-react';
+import { Search, KeyRound, Plug } from 'lucide-react';
 import Image from 'next/image';
 import emptyIcon from "../../_assests/emptyIcon.svg"
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import IntegrationModal from '../../_components/IntegrationModal';
+import ApiKeyModal from '../../_components/ApiKeyModal';
 
 interface ClientObj {
     id: string;
@@ -27,19 +29,37 @@ export default function Page() {
     const [token, setToken] = useState<string | null>(null);
     const [clients, setClients] = useState<ClientObj[]>([])
     const [isLoading, setIsLoading] = useState(true)
-
+    const [integrationModalClient, setIntegrationModalClient] = useState<{ id: string; name: string } | null>(null);
+    const [apiKeyModalClient, setApiKeyModalClient] = useState<{ id: string; name: string } | null>(null);
 
     const ClientComp = ({name, id}:{name: string, id: string}) => {
     return (
-        <div className='rounded-md bg-white h-[100px] shadow-md hover:shadow-none'>
+        <div className='rounded-md bg-white min-h-[100px] shadow-md hover:shadow-none'>
             <div className='flex flex-row items-stretch h-[36px] border-b-[1.5px]  border-b-[#ececec]'>
                 <div className='flex-1'></div>
                 <p className='flex items-center pl-2 border-l-[1.5px]  border-l-[#ececec] flex-[3] font-semibold text-base'>{name}</p>
             </div>
-            <div className='pl-2 md:pl-4 lg:pl-6 pb-4 mt-2 md:mt-3 lg:mt-4'>
-                {/* <p onClick={() => router.push("/admin/clients")} className='cursor-pointer text-[#8a8a8a] text-base mb-2 mb:mb-3 lg:mb-4'>Open projects</p> */}
-                <p className='cursor-pointer text-[#8a8a8a] text-base inline' onClick={()=>router.push(`/admin/clients/${id}`)}>Client History</p>
-            </div> 
+            <div className='pl-2 md:pl-4 lg:pl-6 pb-4 mt-2 md:mt-3 lg:mt-4 space-y-2'>
+                <p className='cursor-pointer text-[#8a8a8a] text-base block hover:text-[#485d3a]' onClick={()=>router.push(`/admin/clients/${id}`)}>Client History</p>
+                <div className='flex flex-wrap gap-2'>
+                    <button
+                        type="button"
+                        onClick={() => setIntegrationModalClient({ id, name })}
+                        className='inline-flex items-center gap-1.5 text-sm text-[#485d3a] hover:text-[#3d4e2f] font-medium'
+                    >
+                        <Plug className="w-4 h-4" />
+                        Integration
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setApiKeyModalClient({ id, name })}
+                        className='inline-flex items-center gap-1.5 text-sm text-[#485d3a] hover:text-[#3d4e2f] font-medium'
+                    >
+                        <KeyRound className="w-4 h-4" />
+                        API Key
+                    </button>
+                </div>
+            </div>
         </div>
     )
   }
@@ -156,5 +176,21 @@ export default function Page() {
                     </div>
                 }
             </div>
+
+            {integrationModalClient && (
+                <IntegrationModal
+                    clientId={integrationModalClient.id}
+                    companyName={integrationModalClient.name}
+                    handleClose={() => setIntegrationModalClient(null)}
+                    getClients={getClients}
+                />
+            )}
+            {apiKeyModalClient && (
+                <ApiKeyModal
+                    clientId={apiKeyModalClient.id}
+                    companyName={apiKeyModalClient.name}
+                    handleClose={() => setApiKeyModalClient(null)}
+                />
+            )}
   )
 }

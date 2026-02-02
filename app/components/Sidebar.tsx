@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react'
 import Image from "next/image"
-import { LayoutDashboard, CheckCircle, BarChart3, MessageSquareWarning, X } from 'lucide-react';
+import { LayoutDashboard, CheckCircle, BarChart3, MessageSquareWarning, Settings, X } from 'lucide-react';
 import { useMyContext } from '../context/MyContext';
 import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
@@ -76,6 +76,12 @@ export default function Sidebar() {
                 className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/complains' ? ' bg-[#485d3a] text-white' : ''}`}>
                 <MessageSquareWarning className='text-2xl' />
                 <p className='text-base font-semibold'>Complains</p>
+            </li>
+            <li 
+                onClick={()=>{handleRouter('/settings');setIsSidebarOpen(false)}}
+                className={`cursor-pointer flex flex-row justify-center items-center px-2 md:px-4 py-2 gap-3 rounded-md text-[#485d3a] hover:bg-[#485d3a] hover:text-white ${pathname === '/settings' ? ' bg-[#485d3a] text-white' : ''}`}>
+                <Settings className='text-2xl' />
+                <p className='text-base font-semibold'>Settings</p>
             </li>
         </ul>
     </div>
