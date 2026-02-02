@@ -2,8 +2,7 @@ name: Deploy AOandCOTechnologies to Cloud Run
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   deploy:
@@ -13,20 +12,16 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # Authenticate using Service Account JSON
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Install and configure gcloud
       - name: Set up gcloud
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: aoandco-web
+          project_id: aoandco-web   # keep consistent
 
-      # Deploy to Cloud Run using Buildpacks
-      # NEXT_PUBLIC_* must be set at BUILD time (Next.js inlines them). Use NEXT_PUBLIC_API_URL in GitHub Secrets.
       - name: Deploy AOandCO to Cloud Run
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
@@ -37,5 +32,5 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --memory 2Gi \
-            --build-env-vars NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --set-build-env-vars NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
             --set-env-vars NODE_ENV=production
