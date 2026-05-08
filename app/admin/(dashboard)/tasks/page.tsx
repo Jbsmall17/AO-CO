@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiBase } from "@/lib/apiBase";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Search, Trash2, User, Eye, XCircle, AlertTriangle, X } from "lucide-react";
+import { Search, Trash2, User, Eye, XCircle, AlertTriangle, X, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import emptyIcon from "../../_assests/emptyIcon.svg";
 import { useRouter } from "next/navigation";
@@ -153,7 +153,6 @@ function Page() {
     })
   }
 
-
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) =>{
     const endpoint = `${apiBase()}/v1/admin/tasks`
     setKeyword(e.target.value)
@@ -274,7 +273,7 @@ function Page() {
   };
 
   const handleApprovedReport = async () => {
-    if (selectedTasks.length > 1) {
+    if (selectedTasks.length > 0) {
       const endpoint =
         `${apiBase()}/v1/admin/approve-report`;
       const selectedTasksIds = selectedTasks.map((task) => task._id);
@@ -314,6 +313,10 @@ function Page() {
   };
 
   const Task = ({ task, index }: { task: taskObj; index: number }) => {
+    const canReassignTask =
+      statusFilter !== "pending" &&
+      (statusFilter !== "all" || task.status !== "pending");
+
     const selectTask = (task: taskObj) => {
       const foundTask = selectedTasks.find((t) => t._id === task._id);
       if (foundTask) {
@@ -449,6 +452,19 @@ function Page() {
                 <User className="w-4 h-4 inline" />
               </button>
             )}
+            {canReassignTask && (
+              <button
+                onClick={() => {
+                  setIsTaskModalOpen(true);
+                  setTaskIds([task._id]);
+                  setActivityId(task.activityId);
+                }}
+                title="Reassign task"
+                className="cursor-pointer text-indigo-600 hover:text-indigo-900 transition-colors duration-200 px-3 py-1 rounded-md hover:bg-indigo-50 border border-indigo-200 hover:border-indigo-300"
+              >
+                <RefreshCw className="w-4 h-4 inline" />
+              </button>
+            )}
             {/* {task.status !== "completed" && ( */}
               <button
                 onClick={() => {
@@ -524,6 +540,8 @@ function Page() {
         return "bg-green-100 text-green-800";
       case "assigned":
         return "bg-blue-100 text-blue-800";
+      case "incomplete":
+        return "bg-orange-100 text-orange-800";
       case "in-progress":
         return "bg-yellow-100 text-yellow-800";
       case "pending":
@@ -730,9 +748,19 @@ function Page() {
               Completed
             </li>
             <li
-              onClick={() => handleFilter("over-due")}
+              onClick={() => handleFilter("incomplete")}
               className={`cursor-pointer text-base px-4 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${
-                statusFilter === "over-due"
+                statusFilter === "incomplete"
+                  ? "bg-[#485d3a] text-white"
+                  : "bg-[#e3e2e2] text-[#0f170a]"
+              }`}
+            >
+              Incomplete
+            </li>
+            <li
+              onClick={() => handleFilter("overdue")}
+              className={`cursor-pointer text-base px-4 py-2 rounded-xl hover:bg-[#485d3a] hover:text-white ${
+                statusFilter === "overdue"
                   ? "bg-[#485d3a] text-white"
                   : "bg-[#e3e2e2] text-[#0f170a]"
               }`}
@@ -747,15 +775,16 @@ function Page() {
           </div>
         ) : tasks.length > 0 ? (
           <div className="flex-1 mb-4 mx-4 lg:mx-6 m-3 md:m-5 bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
-            {selectedTasks.length > 1 && (
+            {selectedTasks.length > 0 && (
               <div className="flex flex-row justify-end gap-4 p-2">
-                <button
-                  //   onClick={}
-                  onClick={assignMultipleTask}
-                  className="cursor-pointer text-white bg-green-600 hover:bg-green-900 transition-colors duration-200 px-3 py-2 rounded-md"
-                >
-                  Assign Task
-                </button>
+                {selectedTasks.length > 1 && (
+                  <button
+                    onClick={assignMultipleTask}
+                    className="cursor-pointer text-white bg-green-600 hover:bg-green-900 transition-colors duration-200 px-3 py-2 rounded-md"
+                  >
+                    Assign Task
+                  </button>
+                )}
                 <button
                   onClick={handleDownloadReport}
                   className="cursor-pointer text-white bg-blue-600 hover:bg-blue-900 transition-colors duration-200 px-3 py-2 rounded-md"

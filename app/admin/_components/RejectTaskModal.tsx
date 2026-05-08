@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
 import { apiBase } from "@/lib/apiBase";
 import axios from 'axios'
 import { X } from 'lucide-react'

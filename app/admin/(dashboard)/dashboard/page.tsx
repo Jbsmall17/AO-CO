@@ -26,6 +26,7 @@ interface DashboardStatsType {
   completedTasks: number;
   overdueTasks: number;
   pendingTasks: number;
+  incompleteTasks: number;
   verifiedTasks: number;
   agentCount: number;
   taskFiles: taskFileType[];
@@ -53,6 +54,7 @@ function Page() {
     completedTasks: 0,
     overdueTasks: 0,
     pendingTasks: 0,
+    incompleteTasks: 0,
     verifiedTasks: 0,
     agentCount: 0,
     taskFiles: [],
@@ -130,6 +132,7 @@ function Page() {
           completedTasks: 0,
           overdueTasks: 0,
           pendingTasks: 0,
+          incompleteTasks: 0,
           verifiedTasks: 0,
           agentCount: 0,
           taskFiles: [],
@@ -235,6 +238,16 @@ function Page() {
                 dashboardStats.overdueTasks == 0
                   ? "bg-[#8a8a8a]"
                   : "bg-[#ff0000]"
+              }
+            />
+            <Card
+              type="first"
+              paraText1="Total Incomplete"
+              paraText2={dashboardStats.incompleteTasks.toString()}
+              bgColor={
+                dashboardStats.incompleteTasks == 0
+                  ? "bg-[#8a8a8a]"
+                  : "bg-[#f97316]"
               }
             />
             <Card
