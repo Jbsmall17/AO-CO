@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiBase } from "@/lib/apiBase";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Search, Trash2, User, Eye, XCircle, AlertTriangle, X, RefreshCw } from "lucide-react";
+import { Search, Trash2, User, Eye, XCircle, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import emptyIcon from "../../_assests/emptyIcon.svg";
 import { useRouter } from "next/navigation";
@@ -121,8 +121,6 @@ function Page() {
   const [activityId, setActivityId] = useState<string | null>(null);
   const [isDeleteTaskModalOpen, setIsDeleteTaskModalOpen] = useState(false);
   const [isRejectTaskModalOpen, setIsRejectTaskModalOpen] = useState(false);
-  const [isDeleteAllModalOpen, setIsDeleteAllModalOpen] = useState(false);
-  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [currentFilter, setCurrentFilter] = useState("all")
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(25);
@@ -590,34 +588,6 @@ function Page() {
     setTaskIds([])
   }
 
-  const deleteAllTasks = async () => {
-    if (!token) return;
-    setIsDeletingAll(true);
-    try {
-      const url = `${apiBase()}/v1/admin/tasks/all`;
-      const res = await axios.post(
-        url,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (res.status >= 200 && res.status < 300) {
-        toast.success(res.data?.message ?? "All tasks deleted");
-        setSelectedTasks([]);
-        setIsAllSelected(false);
-        setCurrentPage(1);
-        setIsDeleteAllModalOpen(false);
-        setIsTaskLoading(true);
-        await getTasks(currentFilter);
-      }
-    } catch (err: any) {
-      toast.error(
-        err.response?.data?.message ?? "Failed to delete all tasks"
-      );
-    } finally {
-      setIsDeletingAll(false);
-    }
-  };
-
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
     if (storedToken) {
@@ -648,19 +618,8 @@ function Page() {
           <p className="text-base md:text-xl font-semibold leading-none">
             Tasks
           </p>
-          <div className="flex flex-row items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsDeleteAllModalOpen(true)}
-              disabled={isTaskLoading || tasks.length === 0}
-              className="inline-flex items-center gap-2 rounded-md border border-red-700 bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <AlertTriangle className="h-4 w-4 shrink-0" />
-              Delete all tasks
-            </button>
-            <div className="bg-[#485d3a] text-white px-3 py-1 rounded-full text-sm font-medium">
-              {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
-            </div>
+          <div className="bg-[#485d3a] text-white px-3 py-1 rounded-full text-sm font-medium">
+            {tasks.length} {tasks.length === 1 ? "task" : "tasks"}
           </div>
         </div>
         <div className="p-3 md:p-5 lg:px-6 lg:py-3 flex flex-col md:flex-row justify-between gap-3 md:gap-0 items-center border-b-[1.5px] border-b-[#b3b3b3]">
@@ -961,55 +920,6 @@ function Page() {
             handleClose={handleRejectModalClose}
             />
         )}
-        {isDeleteAllModalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center">
-            <div
-              className="absolute inset-0 bg-black/70"
-              onClick={() => !isDeletingAll && setIsDeleteAllModalOpen(false)}
-            />
-            <div className="relative z-[61] mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-              <button
-                type="button"
-                onClick={() => !isDeletingAll && setIsDeleteAllModalOpen(false)}
-                className="absolute right-4 top-4 text-gray-500 hover:text-gray-800"
-                aria-label="Close"
-              >
-                <X className="h-5 w-5" />
-              </button>
-              <div className="flex items-start gap-3 pr-8">
-                <AlertTriangle className="h-8 w-8 shrink-0 text-red-600" />
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Delete all tasks?
-                  </h2>
-                  <p className="mt-2 text-sm text-gray-600">
-                    This will permanently remove every task ({tasks.length} total)
-                    from the system. This action cannot be undone.
-                  </p>
-                </div>
-              </div>
-              <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsDeleteAllModalOpen(false)}
-                  disabled={isDeletingAll}
-                  className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={deleteAllTasks}
-                  disabled={isDeletingAll}
-                  className="rounded-md border border-red-800 bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isDeletingAll ? "Deleting…" : "Yes, delete all"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
       </div>
     </>
   );
