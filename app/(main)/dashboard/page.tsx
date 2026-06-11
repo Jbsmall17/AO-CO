@@ -46,8 +46,17 @@ interface monthlyTaskType {
     total: number;
 }
 
+interface uploadFileOption {
+    _id: string;
+    fileName: string;
+    uploadedAt: string;
+}
+
 interface reportsObj {
     _id: string;
+    taskUploadId?: string | null;
+    uploadFileName?: string | null;
+    uploadDate?: string | null;
     activityId: string;
     customerName: string;
     verificationAddress: string;
@@ -109,6 +118,10 @@ export default function Page() {
     const [isDownloading, setIsDownloading] = React.useState(false)
     const [selectedReports, setSelectedReports] = React.useState<reportsObj[]>([])
     const [isAllReportsSelected, setIsAllReportsSelected] = React.useState(false)
+    const [approvedReports, setApprovedReports] = React.useState<reportsObj[]>([])
+    const [uploadFiles, setUploadFiles] = React.useState<uploadFileOption[]>([])
+    const [selectedTaskUploadId, setSelectedTaskUploadId] = React.useState("")
+    const [isReportsLoading, setIsReportsLoading] = React.useState(false)
     const [dashboardStats, setDashboardStats] = useState<DashboardStatsType>({
         totalPendingFiles: 0,
         totalVerifiedFiles: 0,
@@ -146,8 +159,6 @@ export default function Page() {
                 setDashboardStats({
                     ...response.data.data
                 })
-                setSelectedReports([])
-                setIsAllReportsSelected(false)
             } else {
                 setDashboardStats({
                     totalPendingFiles: 0,
@@ -177,7 +188,41 @@ export default function Page() {
         } finally {
             setIsLoading(false)
         }
-    } 
+    }
+
+    const fetchApprovedReports = async (taskUploadId = selectedTaskUploadId) => {
+        if (!token) return;
+
+        setIsReportsLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (taskUploadId) {
+                params.set("taskUploadId", taskUploadId);
+            }
+
+            const response = await axios.get(
+                `${apiBase()}/v1/client/approved-reports?${params.toString()}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            if (response.status === 200) {
+                setApprovedReports(response.data.data.reports || []);
+                setUploadFiles(response.data.data.uploads || []);
+                setSelectedReports([]);
+                setIsAllReportsSelected(false);
+            }
+        } catch (error) {
+            console.error("Error fetching approved reports:", error);
+            setApprovedReports([]);
+            toast.error("Failed to load approved reports.");
+        } finally {
+            setIsReportsLoading(false);
+        }
+    };
 
     const toggleReportSelection = (report: reportsObj) => {
         const isSelected = selectedReports.some((item) => item._id === report._id);
@@ -195,7 +240,7 @@ export default function Page() {
             setIsAllReportsSelected(false);
             return;
         }
-        setSelectedReports([...dashboardStats.reports]);
+        setSelectedReports([...approvedReports]);
         setIsAllReportsSelected(true);
     };
 
@@ -211,6 +256,7 @@ export default function Page() {
             const excelData = selectedReports.map((report, index) => ({
                 "S/N": index + 1,
                 "Task ID": report._id,
+                "Upload File Name": report.uploadFileName || "",
                 "Activity ID": report.activityId,
                 "Customer Name": report.customerName,
                 "Verification Address": report.fullAddress || report.verificationAddress,
@@ -396,8 +442,9 @@ export default function Page() {
     useEffect(() => {
         if (token) {
             getdashboardStats()
+            fetchApprovedReports(selectedTaskUploadId)
         }
-    }, [token])
+    }, [token, selectedTaskUploadId])
 
   return (  
         <div>
@@ -505,13 +552,34 @@ export default function Page() {
                 }
                 </div>
                 <div className='mb-3 md:mb-4 lg:mb-5 rounded-lg bg-white py-4 px-4 md:px-6 lg:px-8'>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
                             <p className='text-base sm:text-xl font-semibold'>Approved Reports</p>
-                            <p className="text-sm text-[#626262]">
-                                {selectedReports.length} of {dashboardStats.reports.length} selected
-                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                                <label className="flex flex-col gap-1 text-sm text-[#626262]">
+                                    Filter by upload file
+                                    <select
+                                        value={selectedTaskUploadId}
+                                        onChange={(e) => setSelectedTaskUploadId(e.target.value)}
+                                        className="min-w-[220px] border border-[#c4c4c4] rounded-md px-3 py-2 text-sm text-black bg-white"
+                                    >
+                                        <option value="">All upload files</option>
+                                        {uploadFiles.map((upload) => (
+                                            <option key={upload._id} value={upload._id}>
+                                                {upload.fileName} ({new Date(upload.uploadedAt).toLocaleDateString()})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <p className="text-sm text-[#626262] whitespace-nowrap">
+                                    {selectedReports.length} of {approvedReports.length} selected
+                                </p>
+                            </div>
                         </div>
-                        {dashboardStats.reports.length > 0 ? (
+                        {isReportsLoading ? (
+                            <div className="flex justify-center items-center h-[160px]">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#485d3a]"></div>
+                            </div>
+                        ) : approvedReports.length > 0 ? (
                             <div className="overflow-x-auto border border-[#e3e2e2] rounded-lg">
                                 <table className="w-full">
                                     <thead>
@@ -524,6 +592,7 @@ export default function Page() {
                                                     className="size-4 accent-[#485d3a]"
                                                 />
                                             </th>
+                                            <th className="text-sm sm:text-base py-3 px-4 text-[#626262] text-left">Upload File</th>
                                             <th className="text-sm sm:text-base py-3 px-4 text-[#626262] text-left">Activity ID</th>
                                             <th className="text-sm sm:text-base py-3 px-4 text-[#626262] text-left">Customer</th>
                                             <th className="text-sm sm:text-base py-3 px-4 text-[#626262] text-left">Address</th>
@@ -532,7 +601,7 @@ export default function Page() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {dashboardStats.reports.map((report) => (
+                                        {approvedReports.map((report) => (
                                             <tr key={report._id} className="border-b border-b-[#e3e2e2]">
                                                 <td className="py-3 px-4">
                                                     <input
@@ -541,6 +610,9 @@ export default function Page() {
                                                         onChange={() => toggleReportSelection(report)}
                                                         className="size-4 accent-[#485d3a]"
                                                     />
+                                                </td>
+                                                <td className="py-3 px-4 text-sm max-w-[180px] truncate" title={report.uploadFileName || "N/A"}>
+                                                    {report.uploadFileName || "N/A"}
                                                 </td>
                                                 <td className="py-3 px-4 text-sm">{report.activityId}</td>
                                                 <td className="py-3 px-4 text-sm">{report.customerName}</td>
@@ -555,7 +627,11 @@ export default function Page() {
                                 </table>
                             </div>
                         ) : (
-                            <p className="text-sm text-[#626262]">No approved reports available yet.</p>
+                            <p className="text-sm text-[#626262]">
+                                {selectedTaskUploadId
+                                    ? "No approved reports found for the selected upload file."
+                                    : "No approved reports available yet."}
+                            </p>
                         )}
                 </div>
                 <div className='mb-3 md:mb-4 lg:mb-5 rounded-lg bg-white py-4 px-4 md:px-6 lg:px-8'>
@@ -596,7 +672,10 @@ export default function Page() {
                     &&
                     <UploadFileModal
                         handleClose={()=> setIsUploadFileVisible(false)}
-                        getdashboardStats={getdashboardStats}
+                        getdashboardStats={() => {
+                            getdashboardStats();
+                            fetchApprovedReports(selectedTaskUploadId);
+                        }}
                     />
                 }    
         </div>
