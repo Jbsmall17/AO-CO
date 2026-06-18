@@ -127,6 +127,8 @@ export default function Page() {
     const [reportsPage, setReportsPage] = React.useState(1)
     const [reportsRowsPerPage, setReportsRowsPerPage] = React.useState(25)
     const [totalApprovedReports, setTotalApprovedReports] = React.useState(0)
+    const [reportsStartDate, setReportsStartDate] = React.useState("")
+    const [reportsEndDate, setReportsEndDate] = React.useState("")
     const [dashboardStats, setDashboardStats] = useState<DashboardStatsType>({
         totalPendingFiles: 0,
         totalVerifiedFiles: 0,
@@ -207,6 +209,12 @@ export default function Page() {
             const params = new URLSearchParams();
             if (taskUploadId) {
                 params.set("taskUploadId", taskUploadId);
+            }
+            if (reportsStartDate) {
+                params.set("startDate", reportsStartDate);
+            }
+            if (reportsEndDate) {
+                params.set("endDate", reportsEndDate);
             }
 
             const skip = rowsPerPage === -1 ? 0 : (page - 1) * rowsPerPage;
@@ -486,7 +494,7 @@ export default function Page() {
             getdashboardStats()
             fetchApprovedReports(selectedTaskUploadId, reportsPage, reportsRowsPerPage)
         }
-    }, [token, selectedTaskUploadId, reportsPage, reportsRowsPerPage])
+    }, [token, selectedTaskUploadId, reportsPage, reportsRowsPerPage, reportsStartDate, reportsEndDate])
 
     useEffect(() => {
         if (reportsRowsPerPage !== -1 && reportsPage > reportsTotalPages) {
@@ -620,6 +628,30 @@ export default function Page() {
                                             </option>
                                         ))}
                                     </select>
+                                </label>
+                                <label className="flex flex-col gap-1 text-sm text-brand-500">
+                                    Start date
+                                    <input
+                                        type="date"
+                                        value={reportsStartDate}
+                                        onChange={(e) => {
+                                            setReportsStartDate(e.target.value);
+                                            setReportsPage(1);
+                                        }}
+                                        className={`min-w-[170px] ${ui.input}`}
+                                    />
+                                </label>
+                                <label className="flex flex-col gap-1 text-sm text-brand-500">
+                                    End date
+                                    <input
+                                        type="date"
+                                        value={reportsEndDate}
+                                        onChange={(e) => {
+                                            setReportsEndDate(e.target.value);
+                                            setReportsPage(1);
+                                        }}
+                                        className={`min-w-[170px] ${ui.input}`}
+                                    />
                                 </label>
                                 <p className="text-sm text-brand-500 whitespace-nowrap">
                                     {selectedReports.length} of {approvedReports.length} selected on this page
